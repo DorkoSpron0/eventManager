@@ -41,7 +41,7 @@ public class UserService implements UserUseCases {
             return jwtService.generateToken(userFounded.getUsername());
         }
 
-        return null;
+        throw  new IllegalArgumentException("Password not match");
     }
 
     @Override

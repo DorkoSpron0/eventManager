@@ -27,4 +27,10 @@ public class User {
     @ManyToMany(mappedBy = "userSet")
     @JsonIgnore
     Set<Event> events = new HashSet<>();
+
+    public User(Set<Event> events, String username, String password) {
+        this.events = events;
+        this.username = username;
+        this.password = password;
+    }
 }

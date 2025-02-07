@@ -29,4 +29,11 @@ public class Event {
     @JoinTable(name = "event_user", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     Set<User> userSet = new HashSet<>();
 
+    public Event(String name, String description, String place, LocalDate date, Set<User> userSet) {
+        this.name = name;
+        this.description = description;
+        this.place = place;
+        this.date = date;
+        this.userSet = userSet;
+    }
 }

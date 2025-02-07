@@ -1,12 +1,11 @@
 package com.ias.eventManagerRun.controller;
 
-import com.fasterxml.jackson.databind.ser.std.NumberSerializers;
-import com.ias.eventManagerRun.domain.models.User;
+import com.ias.eventManagerRun.controller.DTO.UserDTO;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/iasapi/users")
@@ -16,13 +15,20 @@ public class UserController {
     private UserUseCases userUseCases;
 
     @GetMapping
-    public List<User> getAllUser(){
-        return userUseCases.getAllUsers();
+    public ResponseEntity<?> getAllUser(){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(userUseCases.getAllUsers());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping
-    public User registerUser(@RequestBody User user){
-        return userUseCases.registerUser(user);
+    public ResponseEntity<?> registerUser(@RequestBody UserDTO user){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(userUseCases.registerUser(user.toDomain()));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
-
 }

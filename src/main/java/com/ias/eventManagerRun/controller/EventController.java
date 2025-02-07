@@ -1,13 +1,13 @@
 package com.ias.eventManagerRun.controller;
 
+import com.ias.eventManagerRun.controller.DTO.EventDTO;
 import com.ias.eventManagerRun.controller.DTO.registerUserToEventDTO;
-import com.ias.eventManagerRun.domain.models.Event;
 import com.ias.eventManagerRun.services.EventService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -18,37 +18,75 @@ public class EventController {
     private EventService eventService;
 
     @GetMapping("")
-    public List<Event> getAllEvents(){
-        return eventService.getAllEvents();
+    public ResponseEntity<?> getAllEvents(){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(eventService.getAllEvents());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
-    public Event getEventById(@PathVariable UUID id){
-        return eventService.getEventById(id);
+    public ResponseEntity<?> getEventById(@PathVariable UUID id){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(eventService.getEventById(id));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping
-    public Event registerEvent(@RequestBody Event event){
-        return eventService.registerEvent(event);
+    public ResponseEntity<?> registerEvent(@RequestBody EventDTO event){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.registerEvent(event.toDomain()));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public Event updateEvent(@PathVariable UUID id, @RequestBody Event event){
-        return eventService.updateEventById(id, event);
+    public ResponseEntity<?> updateEvent(@PathVariable UUID id, @RequestBody EventDTO event){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, event.toDomain()));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
-    public String deleteEvent(@PathVariable UUID id){
-        return eventService.removeEvent(id);
+    public ResponseEntity<?> deleteEvent(@PathVariable UUID id){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(eventService.removeEvent(id));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("/{id}/register")
-    public String registerUserToEvent(@PathVariable UUID id, @RequestBody registerUserToEventDTO user){
-        return eventService.registerUserToEvent(id, user.getUserId());
+    public ResponseEntity<?> registerUserToEvent(@PathVariable UUID id, @RequestBody registerUserToEventDTO user){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.registerUserToEvent(id, user.getUserId()));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping("/user/{id}")
-    public Set<Event> getAllEventForUser(@PathVariable UUID id){
-        return eventService.getAllEventByUser(id);
+    public ResponseEntity<?> getAllEventForUser(@PathVariable UUID id){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(eventService.getAllEventByUser(id));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 }
