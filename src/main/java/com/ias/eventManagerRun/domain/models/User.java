@@ -20,8 +20,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "username", unique = true)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
+    @Column(name = "password", nullable = false)
     private String password;
 
     @ManyToMany(mappedBy = "userSet")

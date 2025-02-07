@@ -20,9 +20,16 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "place", nullable = false)
     private String place;
+
+    @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @ManyToMany
