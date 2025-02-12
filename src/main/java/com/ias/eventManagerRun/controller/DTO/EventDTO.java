@@ -2,9 +2,8 @@ package com.ias.eventManagerRun.controller.DTO;
 
 import com.ias.eventManagerRun.domain.models.Event;
 import com.ias.eventManagerRun.domain.models.User;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,9 +15,17 @@ import java.util.Set;
 @Setter
 public class EventDTO {
 
+    @NotBlank
+    @NotNull
     private String name;
+
+    @NotBlank
+    @NotNull
     private String description;
     private String place;
+
+    @NotBlank
+    @NotNull
     private LocalDate date;
 
     Set<User> userSet = new HashSet<>();

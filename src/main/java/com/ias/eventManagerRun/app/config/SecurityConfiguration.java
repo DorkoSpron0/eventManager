@@ -1,7 +1,6 @@
 package com.ias.eventManagerRun.app.config;
 
 import com.ias.eventManagerRun.services.JwtService;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +24,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives("script-src 'self'"))) // XSS PROTECTION
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {

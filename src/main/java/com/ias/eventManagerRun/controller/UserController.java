@@ -2,6 +2,7 @@ package com.ias.eventManagerRun.controller;
 
 import com.ias.eventManagerRun.controller.DTO.UserDTO;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> registerUser(@RequestBody UserDTO user){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTO user){
         try{
             return ResponseEntity.status(HttpStatus.CREATED).body(userUseCases.registerUser(user.toDomain()));
         }catch (Exception e){

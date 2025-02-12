@@ -3,6 +3,7 @@ package com.ias.eventManagerRun.controller;
 import com.ias.eventManagerRun.controller.DTO.EventDTO;
 import com.ias.eventManagerRun.controller.DTO.registerUserToEventDTO;
 import com.ias.eventManagerRun.services.EventService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<?> registerEvent(@RequestBody EventDTO event){
+    public ResponseEntity<?> registerEvent(@Valid @RequestBody EventDTO event){
         try{
             return ResponseEntity.status(HttpStatus.CREATED).body(eventService.registerEvent(event.toDomain()));
         }catch (Exception e){
@@ -47,7 +48,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEvent(@PathVariable UUID id, @RequestBody EventDTO event){
+    public ResponseEntity<?> updateEvent(@PathVariable UUID id,@Valid @RequestBody EventDTO event){
         try{
             return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, event.toDomain()));
         }catch (IllegalArgumentException e){
@@ -69,7 +70,7 @@ public class EventController {
     }
 
     @PostMapping("/{id}/register")
-    public ResponseEntity<?> registerUserToEvent(@PathVariable UUID id, @RequestBody registerUserToEventDTO user){
+    public ResponseEntity<?> registerUserToEvent(@PathVariable UUID id, @Valid @RequestBody registerUserToEventDTO user){
         try{
             return ResponseEntity.status(HttpStatus.CREATED).body(eventService.registerUserToEvent(id, user.getUserId()));
         }catch (IllegalArgumentException e){
