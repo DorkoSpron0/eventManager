@@ -1,4 +1,4 @@
-package com.ias.eventManagerRun.controller.DTO;
+package com.ias.eventManagerRun.infrastructure.entry_points.DTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

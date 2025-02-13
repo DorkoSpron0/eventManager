@@ -1,6 +1,6 @@
-package com.ias.eventManagerRun.services;
+package com.ias.eventManagerRun.infrastructure.repository.services;
 
-import com.ias.eventManagerRun.repository.UserRepository;
+import com.ias.eventManagerRun.infrastructure.repository.IUserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
@@ -22,7 +22,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class JwtService extends OncePerRequestFilter {
 
-    private UserRepository userRepository;
+    private IUserRepository userRepository;
 
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor("my-ultra-super-key-my-ultra-super-key".getBytes());
 

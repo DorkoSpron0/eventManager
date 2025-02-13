@@ -1,9 +1,10 @@
-package com.ias.eventManagerRun.services;
+package com.ias.eventManagerRun.infrastructure.repository.adapters;
+
 
 import com.ias.eventManagerRun.domain.models.Event;
 import com.ias.eventManagerRun.domain.models.User;
 import com.ias.eventManagerRun.domain.usecases.EventUseCases;
-import com.ias.eventManagerRun.repository.EventRepository;
+import com.ias.eventManagerRun.infrastructure.repository.IEventRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +14,10 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class EventService implements EventUseCases {
+public class IEventRepositoryAdapter implements EventUseCases {
 
-    private EventRepository eventRepository;
-    private UserService userService;
+    private IEventRepository eventRepository;
+    private IUserRepositoryAdapter userService;
 
     @Override
     public List<Event> getAllEvents() {

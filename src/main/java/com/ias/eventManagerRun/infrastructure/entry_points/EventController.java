@@ -1,8 +1,8 @@
-package com.ias.eventManagerRun.controller;
+package com.ias.eventManagerRun.infrastructure.entry_points;
 
 import com.ias.eventManagerRun.controller.DTO.EventDTO;
 import com.ias.eventManagerRun.controller.DTO.registerUserToEventDTO;
-import com.ias.eventManagerRun.services.EventService;
+import com.ias.eventManagerRun.infrastructure.repository.adapters.IEventRepositoryAdapter;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class EventController {
 
-    private EventService eventService;
+    private IEventRepositoryAdapter eventService;
 
     @GetMapping("")
     public ResponseEntity<?> getAllEvents(){

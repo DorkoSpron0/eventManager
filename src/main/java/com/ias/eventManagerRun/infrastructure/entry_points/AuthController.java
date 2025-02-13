@@ -1,8 +1,8 @@
-package com.ias.eventManagerRun.controller;
+package com.ias.eventManagerRun.infrastructure.entry_points;
 
 import com.ias.eventManagerRun.controller.DTO.UserDTO;
 import com.ias.eventManagerRun.domain.models.User;
-import com.ias.eventManagerRun.services.UserService;
+import com.ias.eventManagerRun.infrastructure.repository.adapters.IUserRepositoryAdapter;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class AuthController {
 
-    private UserService userService;
+    private IUserRepositoryAdapter userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserDTO user){

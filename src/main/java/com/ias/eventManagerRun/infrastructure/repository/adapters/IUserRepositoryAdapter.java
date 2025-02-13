@@ -1,8 +1,9 @@
-package com.ias.eventManagerRun.services;
+package com.ias.eventManagerRun.infrastructure.repository.adapters;
 
 import com.ias.eventManagerRun.domain.models.User;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
-import com.ias.eventManagerRun.repository.UserRepository;
+import com.ias.eventManagerRun.infrastructure.repository.IUserRepository;
+import com.ias.eventManagerRun.infrastructure.repository.services.*;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,9 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class UserService implements UserUseCases {
+public class IUserRepositoryAdapter implements UserUseCases {
 
-    private UserRepository userRepository;
+    private IUserRepository userRepository;
     private JwtService jwtService;
 
 
