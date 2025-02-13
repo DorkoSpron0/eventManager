@@ -2,7 +2,7 @@ package com.ias.eventManagerRun.infrastructure.entry_points;
 
 import com.ias.eventManagerRun.controller.DTO.EventDTO;
 import com.ias.eventManagerRun.controller.DTO.registerUserToEventDTO;
-import com.ias.eventManagerRun.infrastructure.repository.adapters.IEventRepositoryAdapter;
+import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters.IEventRepositoryAdapter;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

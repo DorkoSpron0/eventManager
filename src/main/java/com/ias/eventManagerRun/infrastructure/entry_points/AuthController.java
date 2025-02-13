@@ -1,8 +1,7 @@
 package com.ias.eventManagerRun.infrastructure.entry_points;
 
 import com.ias.eventManagerRun.controller.DTO.UserDTO;
-import com.ias.eventManagerRun.domain.models.User;
-import com.ias.eventManagerRun.infrastructure.repository.adapters.IUserRepositoryAdapter;
+import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters.IUserRepositoryAdapter;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

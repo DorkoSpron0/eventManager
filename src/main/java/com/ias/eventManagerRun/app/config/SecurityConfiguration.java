@@ -1,6 +1,6 @@
 package com.ias.eventManagerRun.app.config;
 
-import com.ias.eventManagerRun.infrastructure.repository.services.JwtService;
+import com.ias.eventManagerRun.infrastructure.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

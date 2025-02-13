@@ -1,10 +1,10 @@
-package com.ias.eventManagerRun.infrastructure.repository.adapters;
+package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters;
 
 
 import com.ias.eventManagerRun.domain.models.Event;
 import com.ias.eventManagerRun.domain.models.User;
 import com.ias.eventManagerRun.domain.usecases.EventUseCases;
-import com.ias.eventManagerRun.infrastructure.repository.IEventRepository;
+import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IEventRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

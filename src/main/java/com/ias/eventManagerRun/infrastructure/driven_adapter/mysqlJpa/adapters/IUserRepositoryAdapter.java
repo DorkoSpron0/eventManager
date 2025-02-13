@@ -1,9 +1,10 @@
-package com.ias.eventManagerRun.infrastructure.repository.adapters;
+package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters;
 
 import com.ias.eventManagerRun.domain.models.User;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
-import com.ias.eventManagerRun.infrastructure.repository.IUserRepository;
+import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepository;
 import com.ias.eventManagerRun.infrastructure.repository.services.*;
+import com.ias.eventManagerRun.infrastructure.services.JwtService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

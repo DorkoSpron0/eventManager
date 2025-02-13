@@ -1,6 +1,6 @@
-package com.ias.eventManagerRun.infrastructure.repository.services;
+package com.ias.eventManagerRun.infrastructure.services;
 
-import com.ias.eventManagerRun.infrastructure.repository.IUserRepository;
+import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
