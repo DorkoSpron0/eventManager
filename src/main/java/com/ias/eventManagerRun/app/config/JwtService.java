@@ -1,4 +1,4 @@
-package com.ias.eventManagerRun.infrastructure.services;
+package com.ias.eventManagerRun.app.config;
 
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepository;
 import io.jsonwebtoken.Jwts;

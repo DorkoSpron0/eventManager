@@ -10,3 +10,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+springdoc:
+  packages-to-scan: com.ias.eventManagerRun.infrastructure.entry_points
+  paths-to-match: "/iasapi/**"  # Ajusta según tu estructura de rutas

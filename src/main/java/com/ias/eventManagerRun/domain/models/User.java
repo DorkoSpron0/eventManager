@@ -1,6 +1,7 @@
 package com.ias.eventManagerRun.domain.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,8 +21,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Embedded
     @Column(name = "username", unique = true, nullable = false)
-    private String username;
+    private Username username;
+
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -29,7 +32,7 @@ public class User {
     @JsonIgnore
     Set<Event> events = new HashSet<>();
 
-    public User(Set<Event> events, String username, String password) {
+    public User(Set<Event> events, Username username, String password) {
         this.events = events;
         this.username = username;
         this.password = password;

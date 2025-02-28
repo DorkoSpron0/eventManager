@@ -3,8 +3,7 @@ package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters;
 import com.ias.eventManagerRun.domain.models.User;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepository;
-import com.ias.eventManagerRun.infrastructure.repository.services.*;
-import com.ias.eventManagerRun.infrastructure.services.JwtService;
+import com.ias.eventManagerRun.app.config.JwtService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -37,10 +36,10 @@ public class IUserRepositoryAdapter implements UserUseCases {
 
     @Override
     public String loginUser(User user) {
-        User userFounded = findByUsername(user.getUsername());
+        User userFounded = findByUsername(user.getUsername().getValue());
 
         if(user.getPassword().equals(userFounded.getPassword())){
-            return jwtService.generateToken(userFounded.getUsername());
+            return jwtService.generateToken(userFounded.getUsername().getValue());
         }
 
         throw  new IllegalArgumentException("Password not match");

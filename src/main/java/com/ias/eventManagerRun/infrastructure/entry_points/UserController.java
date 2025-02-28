@@ -1,7 +1,7 @@
-package com.ias.eventManagerRun.controller;
+package com.ias.eventManagerRun.infrastructure.entry_points;
 
-import com.ias.eventManagerRun.controller.DTO.UserDTO;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
+import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +27,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTO user){
         try{
+            System.out.println(user.toString());
             return ResponseEntity.status(HttpStatus.CREATED).body(userUseCases.registerUser(user.toDomain()));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

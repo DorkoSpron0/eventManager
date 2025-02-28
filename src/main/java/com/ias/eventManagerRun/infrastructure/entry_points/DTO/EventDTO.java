@@ -1,4 +1,4 @@
-package com.ias.eventManagerRun.controller.DTO;
+package com.ias.eventManagerRun.infrastructure.entry_points.DTO;
 
 import com.ias.eventManagerRun.domain.models.Event;
 import com.ias.eventManagerRun.domain.models.User;
@@ -24,13 +24,11 @@ public class EventDTO {
     private String description;
     private String place;
 
-    @NotBlank
-    @NotNull
     private LocalDate date;
 
     Set<User> userSet = new HashSet<>();
-
     public Event toDomain(){
         return new Event(this.name, this.description, this.place, this.date, this.userSet);
     }
+
 }

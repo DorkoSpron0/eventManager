@@ -1,6 +1,5 @@
 package com.ias.eventManagerRun.app.config;
 
-import com.ias.eventManagerRun.infrastructure.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +29,11 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/iasapi/auth/**").permitAll();
                     auth.requestMatchers(HttpMethod.POST,"/iasapi/users").permitAll();
+                    auth.requestMatchers(
+                            "/v3/api-docs/**",
+                            "/swagger-ui/**",
+                            "/swagger-ui.html"
+                    ).permitAll();
                     auth.requestMatchers("/iasapi/**").authenticated();
                 })
                 .addFilterBefore(jwtService, UsernamePasswordAuthenticationFilter.class)

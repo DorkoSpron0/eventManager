@@ -1,7 +1,8 @@
-package com.ias.eventManagerRun.controller.DTO;
+package com.ias.eventManagerRun.infrastructure.entry_points.DTO;
 
 import com.ias.eventManagerRun.domain.models.Event;
 import com.ias.eventManagerRun.domain.models.User;
+import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,15 @@ public class UserDTO {
     Set<Event> events = new HashSet<>();
 
     public User toDomain(){
-        return new User(this.getEvents(), this.getUsername(), this.getPassword());
+        return new User(this.getEvents(), new Username(this.getUsername()), this.getPassword());
+    }
+
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "events=" + events +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }
