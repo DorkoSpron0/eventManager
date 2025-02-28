@@ -3,9 +3,10 @@ package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ias.eventManagerRun.domain.models.EventModel;
 import com.ias.eventManagerRun.domain.models.UserModel;
-import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
+import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,8 +24,9 @@ public class UserDBO {
     @Id
     private UUID id;
 
+    @Embedded
     @Column(name = "username", unique = true, nullable = false)
-    private String username;
+    private Username username;
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -33,7 +35,7 @@ public class UserDBO {
     @JsonIgnore
     Set<EventDBO> eventDBOS = new HashSet<>();
 
-    public UserDBO(Set<EventDBO> eventDBOS, String username, String password, UUID id) {
+    public UserDBO(Set<EventDBO> eventDBOS, Username username, String password, UUID id) {
         this.eventDBOS = eventDBOS;
         this.username = username;
         this.password = password;
@@ -47,6 +49,7 @@ public class UserDBO {
                 .collect(Collectors.toSet());
 
         return new UserDBO(_eventDBOS, userModel.getUsername(), userModel.getPassword(), userModel.getId());
+
     }
 
     public UserModel toDomain(){

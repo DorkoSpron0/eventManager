@@ -2,6 +2,7 @@ package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO;
 
 import com.ias.eventManagerRun.domain.models.EventModel;
 import com.ias.eventManagerRun.domain.models.UserModel;
+import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import jakarta.persistence.*;
 import jdk.jfr.Event;
 import lombok.*;
@@ -68,7 +69,7 @@ public class EventDBO {
                 name,
                 place,
                 userSet.stream()
-                        .map(userDBO -> new UserModel(null, userDBO.getId(), userDBO.getPassword(), userDBO.getUsername()))
+                        .map(userDBO -> new UserModel(null, userDBO.getId(), userDBO.getPassword(), new Username(userDBO.getUsername().getUsername())))
                         .collect(Collectors.toSet())
         );
     }

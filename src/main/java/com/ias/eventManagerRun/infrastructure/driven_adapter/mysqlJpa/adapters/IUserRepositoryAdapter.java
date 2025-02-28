@@ -41,10 +41,10 @@ public class IUserRepositoryAdapter implements UserUseCases {
 
     @Override
     public String loginUser(UserModel userDBO) {
-        UserModel userDBOFounded = findByUsername(userDBO.getUsername());
+        UserModel userDBOFounded = findByUsername(userDBO.getUsername().getUsername());
 
         if(userDBO.getPassword().equals(userDBOFounded.getPassword())){
-            return jwtService.generateToken(userDBOFounded.getUsername());
+            return jwtService.generateToken(userDBOFounded.getUsername().getUsername());
         }
 
         throw  new IllegalArgumentException("Password not match");
@@ -52,6 +52,6 @@ public class IUserRepositoryAdapter implements UserUseCases {
 
     @Override
     public UserModel findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Not found")).toDomain();
+        return userRepository.findByUsername_Username(username).orElseThrow(() -> new UsernameNotFoundException("Not found")).toDomain();
     }
 }

@@ -1,6 +1,7 @@
 package com.ias.eventManagerRun.infrastructure.entry_points.DTO;
 
 import com.ias.eventManagerRun.domain.models.UserModel;
+import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserDTO {
 
-    @NotEmpty(message = "Username cant be blank")
     private String username;
 
     @NotEmpty(message = "Password cant be blank")
@@ -32,11 +32,11 @@ public class UserDTO {
                 .map(EventDTO::fromDomain)
                 .collect(Collectors.toSet());
 
-        return new UserDTO(userModel.getUsername(), userModel.getPassword(), _eventDTOS);
+        return new UserDTO(new Username(userModel.getUsername().toString()).toString(), userModel.getPassword(), _eventDTOS);
     }
 
     public UserModel toDomain(){
-        return new UserModel(new HashSet<>(), UUID.randomUUID(), password, username);
+        return new UserModel(new HashSet<>(), UUID.randomUUID(), password, new Username(username));
     }
 
     @Override

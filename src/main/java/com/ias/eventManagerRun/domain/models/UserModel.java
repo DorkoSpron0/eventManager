@@ -1,5 +1,7 @@
 package com.ias.eventManagerRun.domain.models;
 
+import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -7,14 +9,14 @@ import java.util.UUID;
 public class UserModel {
 
     private UUID id;
-    private String username;
+    private Username username;
     private String password;
     Set<EventModel> events = new HashSet<>();
 
     public UserModel() {
     }
 
-    public UserModel(Set<EventModel> events, UUID id, String password, String username) {
+    public UserModel(Set<EventModel> events, UUID id, String password, Username username) {
         this.events = events;
         this.id = id;
         this.password = password;
@@ -45,11 +47,11 @@ public class UserModel {
         this.password = password;
     }
 
-    public String getUsername() {
+    public Username getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(Username username) {
         this.username = username;
     }
 
