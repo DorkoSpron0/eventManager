@@ -1,7 +1,8 @@
 package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters;
 
-import com.ias.eventManagerRun.domain.models.User;
+import com.ias.eventManagerRun.domain.models.UserModel;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
+import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepository;
 import com.ias.eventManagerRun.app.config.JwtService;
 import lombok.AllArgsConstructor;
@@ -20,33 +21,37 @@ public class IUserRepositoryAdapter implements UserUseCases {
 
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserModel> getAllUsers() {
+        return userRepository.findAll().stream().map(UserDBO::toDomain).toList();
     }
 
     @Override
-    public User registerUser(User user) {
-        return userRepository.save(user);
+    public UserModel registerUser(UserModel userModel) {
+        UserDBO user = UserDBO.fromDomain(userModel);
+
+        System.out.println(user.toString());
+
+        return userRepository.save(user).toDomain();
     }
 
     @Override
-    public User findById(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public UserModel findById(UUID id) {
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found")).toDomain();
     }
 
     @Override
-    public String loginUser(User user) {
-        User userFounded = findByUsername(user.getUsername().getValue());
+    public String loginUser(UserModel userDBO) {
+        UserModel userDBOFounded = findByUsername(userDBO.getUsername());
 
-        if(user.getPassword().equals(userFounded.getPassword())){
-            return jwtService.generateToken(userFounded.getUsername().getValue());
+        if(userDBO.getPassword().equals(userDBOFounded.getPassword())){
+            return jwtService.generateToken(userDBOFounded.getUsername());
         }
 
         throw  new IllegalArgumentException("Password not match");
     }
 
     @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Not found"));
+    public UserModel findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Not found")).toDomain();
     }
 }

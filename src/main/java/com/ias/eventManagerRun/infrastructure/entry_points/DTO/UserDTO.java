@@ -1,8 +1,6 @@
 package com.ias.eventManagerRun.infrastructure.entry_points.DTO;
 
-import com.ias.eventManagerRun.domain.models.Event;
-import com.ias.eventManagerRun.domain.models.User;
-import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
+import com.ias.eventManagerRun.domain.models.UserModel;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,6 +10,8 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Builder
 @Getter
@@ -25,18 +25,26 @@ public class UserDTO {
     @NotEmpty(message = "Password cant be blank")
     @NotNull(message = "Password cant be null")
     private String password;
-    Set<Event> events = new HashSet<>();
+    Set<EventDTO> eventDTOS = new HashSet<>();
 
-    public User toDomain(){
-        return new User(this.getEvents(), new Username(this.getUsername()), this.getPassword());
+    public static UserDTO fromDomain(UserModel userModel){
+        Set<EventDTO> _eventDTOS = userModel.getEvents().stream()
+                .map(EventDTO::fromDomain)
+                .collect(Collectors.toSet());
+
+        return new UserDTO(userModel.getUsername(), userModel.getPassword(), _eventDTOS);
+    }
+
+    public UserModel toDomain(){
+        return new UserModel(new HashSet<>(), UUID.randomUUID(), password, username);
     }
 
     @Override
     public String toString() {
         return "UserDTO{" +
-                "events=" + events +
-                ", username='" + username + '\'' +
+                "eventDTOS=" + eventDTOS +
                 ", password='" + password + '\'' +
+                ", username='" + username + '\'' +
                 '}';
     }
 }

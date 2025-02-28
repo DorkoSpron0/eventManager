@@ -1,16 +1,22 @@
 package com.ias.eventManagerRun.infrastructure.entry_points.DTO;
 
-import com.ias.eventManagerRun.domain.models.Event;
-import com.ias.eventManagerRun.domain.models.User;
+import com.ias.eventManagerRun.domain.models.EventModel;
+import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
+import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class EventDTO {
@@ -26,9 +32,19 @@ public class EventDTO {
 
     private LocalDate date;
 
-    Set<User> userSet = new HashSet<>();
-    public Event toDomain(){
-        return new Event(this.name, this.description, this.place, this.date, this.userSet);
+    public EventDTO(LocalDate date, String description, String name, String place) {
+        this.date = date;
+        this.description = description;
+        this.name = name;
+        this.place = place;
+    }
+
+    public static EventDTO fromDomain(EventModel eventModel){
+        return new EventDTO(eventModel.getDate(), eventModel.getDescription(), eventModel.getName(), eventModel.getPlace());
+    }
+
+    public EventModel toDBO(){
+        return new EventModel(date, description, UUID.randomUUID(), name, place, new HashSet<>());
     }
 
 }
