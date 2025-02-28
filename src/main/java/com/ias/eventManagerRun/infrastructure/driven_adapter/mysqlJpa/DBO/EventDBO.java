@@ -47,8 +47,6 @@ public class EventDBO {
         this.place = place;
     }
 
-
-
     public EventDBO(String name, String description, String place, LocalDate date, Set<UserDBO> userDBOSet) {
         this.name = name;
         this.description = description;

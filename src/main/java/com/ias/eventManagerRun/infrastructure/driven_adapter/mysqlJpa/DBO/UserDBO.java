@@ -50,10 +50,20 @@ public class UserDBO {
     }
 
     public UserModel toDomain(){
-        Set<EventModel> _eventModels = eventDBOS.stream()
-                .map(EventDBO::toDomain)
-                .collect(Collectors.toSet());
-        return new UserModel(_eventModels, id, password, username);
+        return new UserModel(
+                eventDBOS.stream()
+                        .map(eventDBO -> new EventModel(
+                                eventDBO.getDate(),
+                                eventDBO.getDescription(),
+                                eventDBO.getId(),
+                                eventDBO.getName(),
+                                eventDBO.getPlace(),
+                                null)
+                        ).collect(Collectors.toSet()),
+                id,
+                password,
+                username
+        );
     }
 
     @Override
