@@ -1,5 +1,6 @@
 package com.ias.eventManagerRun.domain.models.ValueObjects;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
@@ -7,6 +8,7 @@ import java.util.Objects;
 @Embeddable
 public class Username {
 
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
     protected Username() {}

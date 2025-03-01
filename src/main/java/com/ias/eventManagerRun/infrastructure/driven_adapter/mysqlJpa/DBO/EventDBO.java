@@ -2,6 +2,8 @@ package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO;
 
 import com.ias.eventManagerRun.domain.models.EventModel;
 import com.ias.eventManagerRun.domain.models.UserModel;
+import com.ias.eventManagerRun.domain.models.ValueObjects.EventDescription;
+import com.ias.eventManagerRun.domain.models.ValueObjects.EventName;
 import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import jakarta.persistence.*;
 import jdk.jfr.Event;
@@ -19,16 +21,17 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @Entity(name = "event")
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class EventDBO {
 
     @Id
     private UUID id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Embedded
+    private EventName name;
 
-    @Column(name = "description", nullable = false)
-    private String description;
+    @Embedded
+    private EventDescription description;
 
     @Column(name = "place", nullable = false)
     private String place;
@@ -40,7 +43,7 @@ public class EventDBO {
     @JoinTable(name = "event_user", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     Set<UserDBO> userSet = new HashSet<>();
 
-    public EventDBO(LocalDate date, String description, UUID id, String name, String place) {
+    public EventDBO(LocalDate date, EventDescription description, UUID id, EventName name, String place) {
         this.date = date;
         this.description = description;
         this.id = id;
@@ -48,7 +51,7 @@ public class EventDBO {
         this.place = place;
     }
 
-    public EventDBO(String name, String description, String place, LocalDate date, Set<UserDBO> userDBOSet) {
+    public EventDBO(EventName name, EventDescription description, String place, LocalDate date, Set<UserDBO> userDBOSet) {
         this.name = name;
         this.description = description;
         this.place = place;

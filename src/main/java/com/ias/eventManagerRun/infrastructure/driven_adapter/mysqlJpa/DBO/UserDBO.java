@@ -3,6 +3,7 @@ package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ias.eventManagerRun.domain.models.EventModel;
 import com.ias.eventManagerRun.domain.models.UserModel;
+import com.ias.eventManagerRun.domain.models.ValueObjects.Password;
 import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,23 +20,23 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @Entity(name = "user")
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = "username"))
 public class UserDBO {
 
     @Id
     private UUID id;
 
     @Embedded
-    @Column(name = "username", unique = true, nullable = false)
     private Username username;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+    @Embedded
+    private Password password;
 
     @ManyToMany(mappedBy = "userSet", cascade = CascadeType.ALL)
     @JsonIgnore
     Set<EventDBO> eventDBOS = new HashSet<>();
 
-    public UserDBO(Set<EventDBO> eventDBOS, Username username, String password, UUID id) {
+    public UserDBO(Set<EventDBO> eventDBOS, Username username, Password password, UUID id) {
         this.eventDBOS = eventDBOS;
         this.username = username;
         this.password = password;

@@ -1,6 +1,8 @@
 package com.ias.eventManagerRun.infrastructure.entry_points.DTO;
 
 import com.ias.eventManagerRun.domain.models.EventModel;
+import com.ias.eventManagerRun.domain.models.ValueObjects.EventDescription;
+import com.ias.eventManagerRun.domain.models.ValueObjects.EventName;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
 import jakarta.validation.constraints.NotBlank;
@@ -40,11 +42,11 @@ public class EventDTO {
     }
 
     public static EventDTO fromDomain(EventModel eventModel){
-        return new EventDTO(eventModel.getDate(), eventModel.getDescription(), eventModel.getName(), eventModel.getPlace());
+        return new EventDTO(eventModel.getDate(), eventModel.getDescription().getDescription(), eventModel.getName().getName(), eventModel.getPlace());
     }
 
     public EventModel toDBO(){
-        return new EventModel(date, description, UUID.randomUUID(), name, place, new HashSet<>());
+        return new EventModel(date, new EventDescription(description), UUID.randomUUID(), new EventName(name), place, new HashSet<>());
     }
 
 }

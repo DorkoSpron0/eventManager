@@ -1,6 +1,7 @@
 package com.ias.eventManagerRun.infrastructure.entry_points.DTO;
 
 import com.ias.eventManagerRun.domain.models.UserModel;
+import com.ias.eventManagerRun.domain.models.ValueObjects.Password;
 import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -32,11 +33,11 @@ public class UserDTO {
                 .map(EventDTO::fromDomain)
                 .collect(Collectors.toSet());
 
-        return new UserDTO(new Username(userModel.getUsername().toString()).toString(), userModel.getPassword(), _eventDTOS);
+        return new UserDTO(new Username(userModel.getUsername().toString()).toString(), userModel.getPassword().getPassword(), _eventDTOS);
     }
 
     public UserModel toDomain(){
-        return new UserModel(new HashSet<>(), UUID.randomUUID(), password, new Username(username));
+        return new UserModel(new HashSet<>(), UUID.randomUUID(), new Password(password), new Username(username));
     }
 
     @Override
