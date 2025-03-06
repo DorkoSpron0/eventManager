@@ -1,5 +1,6 @@
 package com.ias.eventManagerRun.domain.models.ValueObjects;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
@@ -19,6 +20,7 @@ public class Password {
         this.password = password;
     }
 
+    @JsonValue
     public String getPassword() {
         return password;
     }

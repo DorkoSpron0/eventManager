@@ -1,5 +1,6 @@
 package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.ias.eventManagerRun.domain.models.EventModel;
 import com.ias.eventManagerRun.domain.models.UserModel;
 import com.ias.eventManagerRun.domain.models.ValueObjects.EventDescription;

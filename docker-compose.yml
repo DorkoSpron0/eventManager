@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mysql:8.0.41-debian
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: eventManagerIas
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data:

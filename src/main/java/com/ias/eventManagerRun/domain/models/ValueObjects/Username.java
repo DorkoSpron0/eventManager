@@ -1,5 +1,6 @@
 package com.ias.eventManagerRun.domain.models.ValueObjects;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
@@ -18,6 +19,7 @@ public class Username {
         this.username = username;
     }
 
+    @JsonValue
     public String getUsername() {
         return username;
     }
