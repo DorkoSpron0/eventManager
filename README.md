@@ -25,15 +25,15 @@ mvn spring-boot:run
 *Esto tomará por defecto entorno dev y credenciales root para mysql en local en puerto 3306*
 
 Si quieres modificar alguna variable de entorno ejecuta lo siguiente.
-### Windows
+### Windows Powershell
 ```bash
-set SPRING_PROFILES_ACTIVE=dev && set SPRING_DATASOURCE_USERNAME=root && set SPRING_DATASOURCE_PASSWORD=root && mvn spring-boot:run
+$env:SPRING_DATASOURCE_USERNAME="root"; $env:SPRING_DATASOURCE_PASSWORD="root"; $env:SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3306/eventManagerIas" mvn spring-boot:run
 ```
 *(Cambiar las variables por las propias, por defecto tomará root)*
 
 ### Linux
 ```bash
-SPRING_PROFILES_ACTIVE=dev SPRING_DATASOURCE_USERNAME=root SPRING_DATASOURCE_PASSWORD=root mvn spring-boot:run
+SPRING_PROFILES_ACTIVE=dev SPRING_DATASOURCE_USERNAME=root SPRING_DATASOURCE_PASSWORD=root SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/eventManagerIas mvn spring-boot:run
 ```
 *(Cambiar las variables por las propias, por defecto tomará root)*
 
@@ -48,7 +48,7 @@ Si quieres crear de forma automática los contenedores ejecuta:
 ```bash
 docker-compose up -d --build
 ```
-*Esto tardará un aproximado de 10 segundos*
+*Esto tardará un aproximado de 20 segundos*
 
 Para cerrar y eliminar los contenedores ejecuta:
 ```bash
