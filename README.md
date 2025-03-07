@@ -37,9 +37,9 @@ SPRING_PROFILES_ACTIVE=dev SPRING_DATASOURCE_USERNAME=root SPRING_DATASOURCE_PAS
 ```
 *(Cambiar las variables por las propias, por defecto tomará root)*
 
-##  Producción
+## ☁️ Producción
 
-Esta aplicación para producción usa contenedores de Docker.
+Esta aplicación para producción usa contenedores de Docker. 🐳
 Esto implica que tanto la aplicación como la base de datos serán contenedores de Docker.
 
 ### Docker compose
