@@ -9,6 +9,7 @@ import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IEventRepo
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -43,15 +44,27 @@ public class IEventRepositoryAdapter implements EventUseCases {
     @Override
     public EventModel updateEventById(UUID id, EventModel eventModel) {
         EventDBO eventDBOFounded = EventDBO.fromDomain(getEventById(id));
+
+        // Actualizamos solo los campos del evento
         eventDBOFounded.setName(eventModel.getName());
         eventDBOFounded.setPlace(eventModel.getPlace());
         eventDBOFounded.setDate(eventModel.getDate());
         eventDBOFounded.setDescription(eventModel.getDescription());
 
-        eventDBOFounded.setUserSet(eventModel.getUserModels().stream().map(UserDBO::fromDomain).collect(Collectors.toSet()));
+        // Manejo correcto de los usuarios
+        Set<UserDBO> existingUsers = eventDBOFounded.getUserSet() != null ? eventDBOFounded.getUserSet() : new HashSet<>();
+        Set<UserDBO> newUsers = eventModel.getUserModels() != null
+                ? eventModel.getUserModels().stream().map(UserDBO::fromDomain).collect(Collectors.toSet())
+                : new HashSet<>();
+
+        // Evitamos duplicados y eliminaciones accidentales
+        existingUsers.addAll(newUsers);
+
+        eventDBOFounded.setUserSet(existingUsers);
 
         return eventRepository.save(eventDBOFounded).toDomain();
     }
+
 
     @Override
     public String registerUserToEvent(UUID event_id, UUID user_id) {

@@ -3,13 +3,13 @@
 API RESTFull para gestionar eventos. La API se utiliza para crear, actualizar, eliminar y listar eventos.
 
 ## ✅ Requerimientos. 
->[!note] Desarrollo
+> Desarrollo
 > En caso de estar en desarrollo con los requerimientos son:
 > 1. Tener Java instalado (versión 21)
 > 2. Tener Maven
 > 3. Tener Mysql en puerto 3306
 
->[!note] Producción
+> Producción
 >En caso de querer desplegar los requerimientos son:
 >
 >1. Tener Docker

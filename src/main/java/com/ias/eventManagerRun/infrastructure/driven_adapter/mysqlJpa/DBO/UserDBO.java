@@ -10,9 +10,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.userdetails.User;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Builder
@@ -46,13 +44,15 @@ public class UserDBO {
 
     public static UserDBO fromDomain(UserModel userModel)
     {
-        Set<EventDBO> _eventDBOS = userModel.getEvents().stream()
+        Set<EventDBO> _eventDBOS = Optional.ofNullable(userModel.getEvents())
+                .orElse(Collections.emptySet())  // ✅ Si es null, se convierte en un conjunto vacío
+                .stream()
                 .map(EventDBO::fromDomain)
                 .collect(Collectors.toSet());
 
         return new UserDBO(_eventDBOS, userModel.getUsername(), userModel.getPassword(), userModel.getId());
-
     }
+
 
     public UserModel toDomain(){
         return new UserModel(

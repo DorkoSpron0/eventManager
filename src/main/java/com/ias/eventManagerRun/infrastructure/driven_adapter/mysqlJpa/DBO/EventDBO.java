@@ -61,9 +61,27 @@ public class EventDBO {
     }
 
 
-    public static EventDBO fromDomain(EventModel eventModel){
-        return new EventDBO(eventModel.getDate(), eventModel.getDescription(), eventModel.getId(), eventModel.getName(), eventModel.getPlace());
+    public static EventDBO fromDomain(EventModel eventModel) {
+        EventDBO eventDBO = new EventDBO(
+                eventModel.getDate(),
+                eventModel.getDescription(),
+                eventModel.getId(),
+                eventModel.getName(),
+                eventModel.getPlace()
+        );
+
+        // ✅ Agregamos la asignación de `userSet`
+        if (eventModel.getUserModels() != null) {
+            eventDBO.setUserSet(eventModel.getUserModels().stream()
+                    .map(UserDBO::fromDomain)
+                    .collect(Collectors.toSet()));
+        } else {
+            eventDBO.setUserSet(new HashSet<>());
+        }
+
+        return eventDBO;
     }
+
 
     public EventModel toDomain(){
         return new EventModel(
