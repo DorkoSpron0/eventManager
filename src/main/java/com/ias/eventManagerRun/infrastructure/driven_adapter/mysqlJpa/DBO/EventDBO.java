@@ -1,20 +1,14 @@
 package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.ias.eventManagerRun.domain.models.EventModel;
-import com.ias.eventManagerRun.domain.models.UserModel;
 import com.ias.eventManagerRun.domain.models.ValueObjects.EventDescription;
 import com.ias.eventManagerRun.domain.models.ValueObjects.EventName;
-import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import jakarta.persistence.*;
-import jdk.jfr.Event;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Builder
 @AllArgsConstructor
@@ -26,6 +20,7 @@ import java.util.stream.Collectors;
 public class EventDBO {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Embedded
@@ -58,42 +53,6 @@ public class EventDBO {
         this.place = place;
         this.date = date;
         this.userSet = userDBOSet;
-    }
-
-
-    public static EventDBO fromDomain(EventModel eventModel) {
-        EventDBO eventDBO = new EventDBO(
-                eventModel.getDate(),
-                eventModel.getDescription(),
-                eventModel.getId(),
-                eventModel.getName(),
-                eventModel.getPlace()
-        );
-
-        // ✅ Agregamos la asignación de `userSet`
-        if (eventModel.getUserModels() != null) {
-            eventDBO.setUserSet(eventModel.getUserModels().stream()
-                    .map(UserDBO::fromDomain)
-                    .collect(Collectors.toSet()));
-        } else {
-            eventDBO.setUserSet(new HashSet<>());
-        }
-
-        return eventDBO;
-    }
-
-
-    public EventModel toDomain(){
-        return new EventModel(
-                date,
-                description,
-                id,
-                name,
-                place,
-                userSet.stream()
-                        .map(userDBO -> new UserModel(null, userDBO.getId(), userDBO.getPassword(), new Username(userDBO.getUsername().getUsername())))
-                        .collect(Collectors.toSet())
-        );
     }
 
     @Override

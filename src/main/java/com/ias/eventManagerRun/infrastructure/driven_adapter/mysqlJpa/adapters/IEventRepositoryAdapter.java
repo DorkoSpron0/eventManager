@@ -1,7 +1,6 @@
 package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters;
 
 
-import com.ias.eventManagerRun.domain.models.EventModel;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
 import com.ias.eventManagerRun.domain.usecases.EventUseCases;
@@ -23,55 +22,42 @@ public class IEventRepositoryAdapter implements EventUseCases {
     private IUserRepositoryAdapter userService;
 
     @Override
-    public List<EventModel> getAllEvents() {
-        return eventRepository.findAll().stream().map(EventDBO::toDomain).toList();
+    public List<EventDBO> getAllEvents() {
+        return eventRepository.findAll();
     }
 
     @Override
-    public EventModel registerEvent(EventModel eventModel) {
-        EventDBO eventDBO = EventDBO.fromDomain(eventModel);
-
-        System.out.println(eventDBO.toString());
-
-        return eventRepository.save(eventDBO).toDomain();
+    public EventDBO registerEvent(EventDBO event) {
+        return eventRepository.save(event);
     }
 
     @Override
-    public EventModel getEventById(UUID id) {
-        return eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Event not found")).toDomain();
+    public EventDBO getEventById(UUID id) {
+        return eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Event not found"));
     }
 
     @Override
-    public EventModel updateEventById(UUID id, EventModel eventModel) {
-        EventDBO eventDBOFounded = EventDBO.fromDomain(getEventById(id));
+    public EventDBO updateEventById(UUID id, EventDBO EventDBO) {
+        EventDBO eventDBOFounded = getEventById(id);
 
         // Actualizamos solo los campos del evento
-        eventDBOFounded.setName(eventModel.getName());
-        eventDBOFounded.setPlace(eventModel.getPlace());
-        eventDBOFounded.setDate(eventModel.getDate());
-        eventDBOFounded.setDescription(eventModel.getDescription());
+        eventDBOFounded.setName(EventDBO.getName());
+        eventDBOFounded.setPlace(EventDBO.getPlace());
+        eventDBOFounded.setDate(EventDBO.getDate());
+        eventDBOFounded.setDescription(EventDBO.getDescription());
 
-        // Manejo correcto de los usuarios
-        Set<UserDBO> existingUsers = eventDBOFounded.getUserSet() != null ? eventDBOFounded.getUserSet() : new HashSet<>();
-        Set<UserDBO> newUsers = eventModel.getUserModels() != null
-                ? eventModel.getUserModels().stream().map(UserDBO::fromDomain).collect(Collectors.toSet())
-                : new HashSet<>();
+        eventDBOFounded.setUserSet(eventDBOFounded.getUserSet());
 
-        // Evitamos duplicados y eliminaciones accidentales
-        existingUsers.addAll(newUsers);
-
-        eventDBOFounded.setUserSet(existingUsers);
-
-        return eventRepository.save(eventDBOFounded).toDomain();
+        return eventRepository.save(eventDBOFounded);
     }
 
 
     @Override
     public String registerUserToEvent(UUID event_id, UUID user_id) {
-        EventDBO eventDBOFounded = EventDBO.fromDomain(getEventById(event_id));
+        EventDBO eventDBOFounded = getEventById(event_id);
 
         System.out.println(eventDBOFounded.toString());
-        UserDBO userDBOFounded = UserDBO.fromDomain(userService.findById(user_id));
+        UserDBO userDBOFounded = userService.findById(user_id);
 
         eventDBOFounded.getUserSet().add(userDBOFounded);
 
@@ -81,15 +67,15 @@ public class IEventRepositoryAdapter implements EventUseCases {
     }
 
     @Override
-    public Set<EventModel> getAllEventByUser(UUID user_id) {
-        UserDBO userDBOFounded = UserDBO.fromDomain(userService.findById(user_id));
+    public Set<EventDBO> getAllEventByUser(UUID user_id) {
+        UserDBO userDBOFounded = userService.findById(user_id);
 
-        return userDBOFounded.getEventDBOS().stream().map(EventDBO::toDomain).collect(Collectors.toSet());
+        return userDBOFounded.getEventDBOS();
     }
 
     @Override
     public String removeEvent(UUID id) {
-        eventRepository.delete(EventDBO.fromDomain(getEventById(id)));
+        eventRepository.delete(getEventById(id));
 
         return "Event with id " + id + " removes successfully";
     }

@@ -1,6 +1,5 @@
 package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters;
 
-import com.ias.eventManagerRun.domain.models.UserModel;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepository;
@@ -21,27 +20,23 @@ public class IUserRepositoryAdapter implements UserUseCases {
 
 
     @Override
-    public List<UserModel> getAllUsers() {
-        return userRepository.findAll().stream().map(UserDBO::toDomain).toList();
+    public List<UserDBO> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override
-    public UserModel registerUser(UserModel userModel) {
-        UserDBO user = UserDBO.fromDomain(userModel);
-
-        System.out.println(user.toString());
-
-        return userRepository.save(user).toDomain();
+    public UserDBO registerUser(UserDBO user) {
+        return userRepository.save(user);
     }
 
     @Override
-    public UserModel findById(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found")).toDomain();
+    public UserDBO findById(UUID id) {
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     @Override
-    public String loginUser(UserModel userDBO) {
-        UserModel userDBOFounded = findByUsername(userDBO.getUsername().getUsername());
+    public String loginUser(UserDBO userDBO) {
+        UserDBO userDBOFounded = findByUsername(userDBO.getUsername().getUsername());
 
         if(userDBO.getPassword().equals(userDBOFounded.getPassword())){
             return jwtService.generateToken(userDBOFounded.getUsername().getUsername());
@@ -51,7 +46,7 @@ public class IUserRepositoryAdapter implements UserUseCases {
     }
 
     @Override
-    public UserModel findByUsername(String username) {
-        return userRepository.findByUsername_Username(username).orElseThrow(() -> new UsernameNotFoundException("Not found")).toDomain();
+    public UserDBO findByUsername(String username) {
+        return userRepository.findByUsername_Username(username).orElseThrow(() -> new UsernameNotFoundException("Not found"));
     }
 }
