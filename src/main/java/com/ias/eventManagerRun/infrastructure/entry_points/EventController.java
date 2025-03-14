@@ -1,15 +1,10 @@
 package com.ias.eventManagerRun.infrastructure.entry_points;
 
-import com.ias.eventManagerRun.domain.models.ValueObjects.EventDescription;
-import com.ias.eventManagerRun.domain.models.ValueObjects.EventName;
-import com.ias.eventManagerRun.domain.models.ValueObjects.Password;
-import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
-import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters.IEventRepositoryAdapter;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
-import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.registerUserToEventDTO;
+import com.ias.eventManagerRun.infrastructure.mappers.EventMapper;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/iasapi/events")
@@ -29,21 +23,7 @@ public class EventController {
     @GetMapping("")
     public ResponseEntity<?> getAllEvents(){
         try{
-            List<EventDBO> eventSet = eventService.getAllEvents();
-
-            List<EventDTO> eventDTOS = Optional.ofNullable(eventService.getAllEvents())
-                    .orElse(new ArrayList<>())
-                    .stream()
-                    .map(eventDBO -> new EventDTO(
-                            eventDBO.getId(),
-                                    eventDBO.getName().getName(),
-                                    eventDBO.getDescription().getDescription(),
-                                    eventDBO.getPlace(),
-                                    eventDBO.getDate(),
-                                    eventDBO.getUserSet() != null ? eventDBO.getUserSet().stream()
-                                            .map(userDBO -> new UserDTO(userDBO.getId(), userDBO.getUsername().getUsername(), userDBO.getPassword().getPassword())).toList() : new ArrayList<>()
-                            )
-                    ).toList();
+            List<EventDTO> eventDTOS = EventMapper.listEventDTOFromEventServiceWithUserWithoutEvents(eventService);
 
             return ResponseEntity.status(HttpStatus.OK).body(eventDTOS);
         }catch (Exception e){
@@ -56,20 +36,7 @@ public class EventController {
         try{
             EventDBO dbo = eventService.getEventById(id);
 
-            EventDTO dtos = new EventDTO(
-                    dbo.getId(),
-                    dbo.getName().getName(),
-                    dbo.getDescription().getDescription(),
-                    dbo.getPlace(),
-                    dbo.getDate(),
-                    dbo.getUserSet() != null ? dbo.getUserSet().stream()
-                            .map(userDBO -> new UserDTO(
-                                    userDBO.getId(),
-                                    userDBO.getUsername().getUsername(),
-                                    userDBO.getPassword().getPassword()
-                            )
-                        ).toList(): new ArrayList<>()
-            );
+            EventDTO dtos = EventMapper.eventBOToEventDTOWithUsersWithoutEvents(dbo);
 
             return ResponseEntity.status(HttpStatus.OK).body(dtos);
         }catch (IllegalArgumentException e){
@@ -84,15 +51,7 @@ public class EventController {
         try{
 
             /* Al momento de registrar un evento no se le pasan usuarios */
-            EventDBO dbo = new EventDBO(
-                    event.getDate(),
-                    new EventDescription(event.getDescription()),
-                    null,
-                    new EventName(event.getName()),
-                    event.getPlace()
-            );
-
-
+            EventDBO dbo = EventMapper.eventDTOToEventDBOWithoutUsers(event);
 
             EventDBO eventDBO = eventService.registerEvent(dbo);
             event.setId(eventDBO.getId());
@@ -107,21 +66,7 @@ public class EventController {
     public ResponseEntity<?> updateEvent(@PathVariable UUID id,@Valid @RequestBody EventDTO event){
         try{
 
-            EventDBO dbo = new EventDBO(
-                    event.getId(),
-                    new EventName(event.getName()),
-                    new EventDescription(event.getDescription()),
-                    event.getPlace(),
-                    event.getDate(),
-                    event.getUsers() != null ? event.getUsers().stream()
-                            .map(userDTO -> new UserDBO(
-                                    userDTO.getId(),
-                                    new Username(userDTO.getUsername()),
-                                    new Password(userDTO.getPassword()),
-                                    null
-                            )
-                        ).collect(Collectors.toSet()) : new HashSet<>()
-            );
+            EventDBO dbo = EventMapper.eventDTOToDBOWithEventsWithoutUser(event);
 
             // TODO - RETURN AN DTO
             return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, dbo));
@@ -159,24 +104,7 @@ public class EventController {
         try{
 
             /* RETURN DTO */
-            Set<EventDTO> dtos = Optional.ofNullable(eventService.getAllEventByUser(id))
-                    .orElse(new HashSet<>())
-                    .stream()
-                    .map(eventDBO -> new EventDTO(
-                            eventDBO.getId(),
-                            eventDBO.getName().getName(),
-                            eventDBO.getDescription().getDescription(),
-                            eventDBO.getPlace(),
-                            eventDBO.getDate(),
-                            eventDBO.getUserSet() != null ? eventDBO.getUserSet().stream()
-                                    .map(userDBO -> new UserDTO(
-                                            userDBO.getId(),
-                                            userDBO.getUsername().getUsername(),
-                                            userDBO.getPassword().getPassword()
-                                    )
-                                ).toList() : new ArrayList<>()
-                    )
-                ).collect(Collectors.toSet());
+            Set<EventDTO> dtos = EventMapper.setOfEventDTOFromEventServiceWithEventWithoutUsers(eventService, id);
 
             return ResponseEntity.status(HttpStatus.OK).body(dtos);
         }catch (IllegalArgumentException e){
