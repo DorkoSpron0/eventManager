@@ -37,7 +37,7 @@ public class UserController {
         try{
             UserDBO userDBO = UserMapper.userDTOToDBO(user);
 
-            UserDBO dbo = userUseCases.registerUser(userDBO);
+            UserDBO dbo = UserMapper.userModelToDBO(userUseCases.registerUser(UserMapper.userDBOToModel(userDBO)));
 
             UserDTO dto = UserMapper.userDBOToDTO(dbo);
 

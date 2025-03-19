@@ -5,6 +5,7 @@ import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters.I
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.registerUserToEventDTO;
 import com.ias.eventManagerRun.infrastructure.mappers.EventMapper;
+import com.ias.eventManagerRun.infrastructure.mappers.UserMapper;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class EventController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getEventById(@PathVariable UUID id){
         try{
-            EventDBO dbo = eventService.getEventById(id);
+            EventDBO dbo = EventMapper.eventModelToDBO(eventService.getEventById(id));
 
             EventDTO dtos = EventMapper.eventBOToEventDTOWithUsersWithoutEvents(dbo);
 
@@ -53,7 +54,7 @@ public class EventController {
             /* Al momento de registrar un evento no se le pasan usuarios */
             EventDBO dbo = EventMapper.eventDTOToEventDBOWithoutUsers(event);
 
-            EventDBO eventDBO = eventService.registerEvent(dbo);
+            EventDBO eventDBO = EventMapper.eventModelToDBO(eventService.registerEvent(EventMapper.eventDBOToModel(dbo)));
             event.setId(eventDBO.getId());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(event);
@@ -69,7 +70,7 @@ public class EventController {
             EventDBO dbo = EventMapper.eventDTOToDBOWithEventsWithoutUser(event);
 
             // TODO - RETURN AN DTO
-            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, dbo));
+            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, EventMapper.eventDBOToModel(dbo)));
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }catch (Exception e){
