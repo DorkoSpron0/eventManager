@@ -1,5 +1,7 @@
 package com.ias.eventManagerRun.infrastructure.mappers;
 
+import com.ias.eventManagerRun.domain.models.EventModel;
+import com.ias.eventManagerRun.domain.models.UserModel;
 import com.ias.eventManagerRun.domain.models.ValueObjects.EventDescription;
 import com.ias.eventManagerRun.domain.models.ValueObjects.EventName;
 import com.ias.eventManagerRun.domain.models.ValueObjects.Password;
@@ -100,5 +102,38 @@ public class EventMapper {
                                         ).toList() : new ArrayList<>()
                         )
                 ).collect(Collectors.toSet());
+    }
+
+    public static EventDBO eventModelToDBO(EventModel model){
+        return new EventDBO(
+                model.getId(),
+                model.getName(),
+                model.getDescription(),
+                model.getPlace(),
+                model.getDate(),
+                model.getUserSet() != null ? model.getUserSet().stream()
+                        .map(userModel -> new UserDBO(
+                                userModel.getId(),
+                                userModel.getUsername(),
+                                userModel.getPassword()
+                        )).collect(Collectors.toSet()) : new HashSet<>()
+        );
+    }
+
+    public static EventModel eventDBOToModel(EventDBO dbo){
+        return new EventModel(
+                dbo.getId(),
+                dbo.getName(),
+                dbo.getDescription(),
+                dbo.getDate(),
+                dbo.getPlace(),
+                dbo.getUserSet() != null ? dbo.getUserSet().stream()
+                        .map(userDBO -> new UserModel(
+                                userDBO.getId(),
+                                userDBO.getUsername(),
+                                userDBO.getPassword())
+                        ).collect(Collectors.toSet()
+                ) : new HashSet<>()
+        );
     }
 }

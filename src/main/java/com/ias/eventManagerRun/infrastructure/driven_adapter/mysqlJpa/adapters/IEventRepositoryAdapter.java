@@ -1,14 +1,16 @@
 package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters;
 
 
+import com.ias.eventManagerRun.domain.models.EventModel;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
 import com.ias.eventManagerRun.domain.usecases.EventUseCases;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IEventRepository;
+import com.ias.eventManagerRun.infrastructure.mappers.EventMapper;
+import com.ias.eventManagerRun.infrastructure.mappers.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -22,23 +24,23 @@ public class IEventRepositoryAdapter implements EventUseCases {
     private IUserRepositoryAdapter userService;
 
     @Override
-    public List<EventDBO> getAllEvents() {
-        return eventRepository.findAll();
+    public List<EventModel> getAllEvents() {
+        return eventRepository.findAll().stream().map(EventMapper::eventDBOToModel).toList();
     }
 
     @Override
-    public EventDBO registerEvent(EventDBO event) {
-        return eventRepository.save(event);
+    public EventModel registerEvent(EventModel event) {
+        return EventMapper.eventDBOToModel(eventRepository.save(EventMapper.eventModelToDBO(event)));
     }
 
     @Override
-    public EventDBO getEventById(UUID id) {
-        return eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Event not found"));
+    public EventModel getEventById(UUID id) {
+        return EventMapper.eventDBOToModel(eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Event not found")));
     }
 
     @Override
-    public EventDBO updateEventById(UUID id, EventDBO EventDBO) {
-        EventDBO eventDBOFounded = getEventById(id);
+    public EventModel updateEventById(UUID id, EventModel EventDBO) {
+        EventDBO eventDBOFounded = EventMapper.eventModelToDBO(getEventById(id));
 
         // Actualizamos solo los campos del evento
         eventDBOFounded.setName(EventDBO.getName());
@@ -48,16 +50,16 @@ public class IEventRepositoryAdapter implements EventUseCases {
 
         eventDBOFounded.setUserSet(eventDBOFounded.getUserSet());
 
-        return eventRepository.save(eventDBOFounded);
+        return EventMapper.eventDBOToModel(eventRepository.save(eventDBOFounded));
     }
 
 
     @Override
     public String registerUserToEvent(UUID event_id, UUID user_id) {
-        EventDBO eventDBOFounded = getEventById(event_id);
+        EventDBO eventDBOFounded = EventMapper.eventModelToDBO(getEventById(event_id));
 
         System.out.println(eventDBOFounded.toString());
-        UserDBO userDBOFounded = userService.findById(user_id);
+        UserDBO userDBOFounded = UserMapper.userModelToDBO(userService.findById(user_id));
 
         eventDBOFounded.getUserSet().add(userDBOFounded);
 
@@ -67,15 +69,15 @@ public class IEventRepositoryAdapter implements EventUseCases {
     }
 
     @Override
-    public Set<EventDBO> getAllEventByUser(UUID user_id) {
-        UserDBO userDBOFounded = userService.findById(user_id);
+    public Set<EventModel> getAllEventByUser(UUID user_id) {
+        UserDBO userDBOFounded = UserMapper.userModelToDBO(userService.findById(user_id));
 
-        return userDBOFounded.getEventDBOS();
+        return userDBOFounded.getEventDBOS().stream().map(EventMapper::eventDBOToModel).collect(Collectors.toSet());
     }
 
     @Override
     public String removeEvent(UUID id) {
-        eventRepository.delete(getEventById(id));
+        eventRepository.delete(EventMapper.eventModelToDBO(getEventById(id)));
 
         return "Event with id " + id + " removes successfully";
     }
