@@ -13,6 +13,7 @@ import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class EventMapper {
@@ -136,4 +137,25 @@ public class EventMapper {
                 ) : new HashSet<>()
         );
     }
+
+    public static final Function<EventDBO, EventModel> functionDBOToModel = (EventDBO dbo) ->
+            new EventModel(
+                dbo.getId(),
+                dbo.getName(),
+                dbo.getDescription(),
+                dbo.getDate(),
+                dbo.getPlace(),
+                dbo.getUserSet() != null ? dbo.getUserSet().stream()
+                        .map(UserMapper.functionUserDBOToModel).collect(Collectors.toSet()) : new HashSet<>()
+        );
+
+    public static final Function<EventModel, EventDBO> functionModelToDBO = (EventModel model) -> new EventDBO(
+            model.getId(),
+            model.getName(),
+            model.getDescription(),
+            model.getPlace(),
+            model.getDate(),
+            model.getUserSet() != null ? model.getUserSet().stream()
+                    .map(UserMapper.functionUserModelToDBO).collect(Collectors.toSet()) : new HashSet<>()
+    );
 }

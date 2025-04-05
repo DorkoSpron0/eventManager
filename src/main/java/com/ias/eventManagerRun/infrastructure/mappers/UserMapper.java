@@ -9,6 +9,7 @@ import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
+import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepository;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -40,7 +42,6 @@ public class UserMapper {
         );
     }
 
-
     public static UserDTO userDBOToDTO(UserDBO dbo){
         return new UserDTO(
                 dbo.getId(),
@@ -62,21 +63,7 @@ public class UserMapper {
         return Optional.ofNullable(userUseCases.getAllUsers())
                 .orElse(new ArrayList<>())
                 .stream()
-                .map(userDBO -> new UserDTO(
-                                userDBO.getId(),
-                                userDBO.getUsername().getUsername(),
-                                userDBO.getPassword().getPassword(),
-                                userDBO.getEventDBOS() != null ? userDBO.getEventDBOS().stream()
-                                        .map(eventDBO -> new EventDTO(
-                                                        eventDBO.getId(),
-                                                        eventDBO.getDate(),
-                                                        eventDBO.getDescription().getDescription(),
-                                                        eventDBO.getName().getName(),
-                                                        eventDBO.getPlace()
-                                                )
-                                        ).collect(Collectors.toSet()) : new HashSet<>()
-                        )
-                ).toList();
+                .map(UserMapper.userModelToDTO).toList();
     }
 
     public static UserModel userDBOToModel(UserDBO dbo){
@@ -111,4 +98,32 @@ public class UserMapper {
                 ).collect(Collectors.toSet()) : new HashSet<>()
         );
     }
+
+    public static final Function<UserDTO, UserDBO> functionUserDTOToDBO = UserMapper::userDTOToDBO;
+
+    public static final Function<UserDBO, UserModel> functionToModel = UserMapper::userDBOToModel;
+
+    public static final Function<UserDBO, UserDTO> functionUserDBOToDTO = UserMapper::userDBOToDTO;
+
+    public static final Function<UserModel, UserDBO> functionUserModelToDBO = UserMapper::userModelToDBO;
+
+    public static final Function<UserDBO, UserModel> functionUserDBOToModel = UserMapper::userDBOToModel;
+
+    public static final Function<UserModel, UserDTO> userModelToDTO = (UserModel model) -> {
+        return new UserDTO(
+                model.getId(),
+                model.getUsername().getUsername(),
+                model.getPassword().getPassword(),
+                model.getEventDBOS() != null ? model.getEventDBOS().stream()
+                        .map(eventDBO -> new EventDTO(
+                                        eventDBO.getId(),
+                                        eventDBO.getDate(),
+                                        eventDBO.getDescription().getDescription(),
+                                        eventDBO.getName().getName(),
+                                        eventDBO.getPlace()
+                                )
+                        ).collect(Collectors.toSet()) : new HashSet<>()
+        );
+    };
+
 }
