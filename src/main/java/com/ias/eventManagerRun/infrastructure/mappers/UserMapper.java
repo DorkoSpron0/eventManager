@@ -2,21 +2,14 @@ package com.ias.eventManagerRun.infrastructure.mappers;
 
 import com.ias.eventManagerRun.domain.models.EventModel;
 import com.ias.eventManagerRun.domain.models.UserModel;
-import com.ias.eventManagerRun.domain.models.ValueObjects.EventDescription;
-import com.ias.eventManagerRun.domain.models.ValueObjects.EventName;
 import com.ias.eventManagerRun.domain.models.ValueObjects.Password;
 import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
-import com.ias.eventManagerRun.domain.usecases.UserUseCases;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
-import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
 import lombok.AllArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
