@@ -24,47 +24,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserMapper {
 
-    public static UserDBO userDTOToDBO(UserDTO user){
-        return new UserDBO(
-                null,
-                new Username(user.getUsername()),
-                new Password(user.getPassword()),
-                user.getEventDTOS() != null ? user.getEventDTOS().stream()
-                        .map(eventDTO -> new EventDBO(
-                                        eventDTO.getDate(),
-                                        new EventDescription(eventDTO.getDescription()),
-                                        null,
-                                        new EventName(eventDTO.getName()),
-                                        eventDTO.getPlace()
-                                )
-                        ).collect(Collectors.toSet()) : new HashSet<>()
-        );
-    }
-
-    public static UserDTO userDBOToDTO(UserDBO dbo){
-        return new UserDTO(
-                dbo.getId(),
-                dbo.getUsername().getUsername(),
-                dbo.getPassword().getPassword(),
-                dbo.getEventDBOS() != null ? dbo.getEventDBOS().stream()
-                        .map(eventDBO -> new EventDTO(
-                                        eventDBO.getId(),
-                                        eventDBO.getDate(),
-                                        eventDBO.getDescription().getDescription(),
-                                        eventDBO.getName().getName(),
-                                        eventDBO.getPlace()
-                                )
-                        ).collect(Collectors.toSet()) : new HashSet<>()
-        );
-    }
-
-    public static List<UserDTO> listUserDToFromUserUseCasesWithEventsWithoutUser(UserUseCases userUseCases){
-        return Optional.ofNullable(userUseCases.getAllUsers())
-                .orElse(new ArrayList<>())
-                .stream()
-                .map(UserMapper.userModelToDTO).toList();
-    }
-
     public static UserModel userDBOToModel(UserDBO dbo){
         return new UserModel(
                 dbo.getId(),
@@ -103,8 +62,8 @@ public class UserMapper {
     public static final Function<UserDBO, UserModel> functionUserDBOToModel = UserMapper::userDBOToModel;
 
     public static final Function<UserModel, UserDTO> functionUserModelToDTO =
-            (UserModel model ) -> {
-                return new UserDTO(
+            (UserModel model ) ->
+            new UserDTO(
                         model.getId(),
                         model.getUsername().getUsername(),
                         model.getPassword().getPassword(),
@@ -112,7 +71,6 @@ public class UserMapper {
                                 .map(EventMapper.functionModelToDTO)
                                 .collect(Collectors.toSet()) : new HashSet<>()
                 );
-            };
 
     public static final Function<UserDTO, UserDBO> functionDTOToDBO = (UserDTO dto) ->
             new UserDBO(
@@ -122,24 +80,6 @@ public class UserMapper {
                     dto.getEventDTOS() != null ? dto.getEventDTOS().stream()
                             .map(EventMapper.functionDTOToDBO).collect(Collectors.toSet()) : new HashSet<>()
             );
-
-
-    public static final Function<UserModel, UserDTO> userModelToDTO = (UserModel model) -> {
-        return new UserDTO(
-                model.getId(),
-                model.getUsername().getUsername(),
-                model.getPassword().getPassword(),
-                model.getEventDBOS() != null ? model.getEventDBOS().stream()
-                        .map(eventDBO -> new EventDTO(
-                                        eventDBO.getId(),
-                                        eventDBO.getDate(),
-                                        eventDBO.getDescription().getDescription(),
-                                        eventDBO.getName().getName(),
-                                        eventDBO.getPlace()
-                                )
-                        ).collect(Collectors.toSet()) : new HashSet<>()
-        );
-    };
 
     public static final Function<UserDBO, UserDTO> functionDBOToDTO = (UserDBO dbo) ->
             new UserDTO(
