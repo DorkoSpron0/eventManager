@@ -18,72 +18,6 @@ import java.util.stream.Collectors;
 
 public class EventMapper {
 
-
-    public static List<EventDTO> listEventDTOFromEventServiceWithUserWithoutEvents(IEventRepositoryAdapter eventService){
-        return Optional.ofNullable(eventService.getAllEvents())
-                .orElse(new ArrayList<>())
-                .stream()
-                .map(eventDBO -> new EventDTO(
-                                eventDBO.getId(),
-                                eventDBO.getName().getName(),
-                                eventDBO.getDescription().getDescription(),
-                                eventDBO.getPlace(),
-                                eventDBO.getDate(),
-                                eventDBO.getUserSet() != null ? eventDBO.getUserSet()
-                                        .stream()
-                                        .map(userDBO -> new UserDTO(
-                                                userDBO.getId(),
-                                                userDBO.getUsername().getUsername(),
-                                                userDBO.getPassword().getPassword())).toList() : new ArrayList<>()
-                        )
-                ).toList();
-    }
-
-    public static EventDTO eventBOToEventDTOWithUsersWithoutEvents(EventDBO dbo){
-        return new EventDTO(
-                dbo.getId(),
-                dbo.getName().getName(),
-                dbo.getDescription().getDescription(),
-                dbo.getPlace(),
-                dbo.getDate(),
-                dbo.getUserSet() != null ? dbo.getUserSet().stream()
-                        .map(userDBO -> new UserDTO(
-                                        userDBO.getId(),
-                                        userDBO.getUsername().getUsername(),
-                                        userDBO.getPassword().getPassword()
-                                )
-                        ).toList(): new ArrayList<>()
-        );
-    }
-
-    public static EventDBO eventDTOToEventDBOWithoutUsers(EventDTO event){
-        return new EventDBO(
-                event.getDate(),
-                new EventDescription(event.getDescription()),
-                null,
-                new EventName(event.getName()),
-                event.getPlace()
-        );
-    }
-
-    public static EventDBO eventDTOToDBOWithEventsWithoutUser(EventDTO event){
-        return new EventDBO(
-                event.getId(),
-                new EventName(event.getName()),
-                new EventDescription(event.getDescription()),
-                event.getPlace(),
-                event.getDate(),
-                event.getUsers() != null ? event.getUsers().stream()
-                        .map(userDTO -> new UserDBO(
-                                        userDTO.getId(),
-                                        new Username(userDTO.getUsername()),
-                                        new Password(userDTO.getPassword()),
-                                        null
-                                )
-                        ).collect(Collectors.toSet()) : new HashSet<>()
-        );
-    }
-
     public static Set<EventDTO> setOfEventDTOFromEventServiceWithEventWithoutUsers(IEventRepositoryAdapter eventService, UUID id){
         return Optional.ofNullable(eventService.getAllEventByUser(id))
                 .orElse(new HashSet<>())
@@ -103,22 +37,6 @@ public class EventMapper {
                                         ).toList() : new ArrayList<>()
                         )
                 ).collect(Collectors.toSet());
-    }
-
-    public static EventDBO eventModelToDBO(EventModel model){
-        return new EventDBO(
-                model.getId(),
-                model.getName(),
-                model.getDescription(),
-                model.getPlace(),
-                model.getDate(),
-                model.getUserSet() != null ? model.getUserSet().stream()
-                        .map(userModel -> new UserDBO(
-                                userModel.getId(),
-                                userModel.getUsername(),
-                                userModel.getPassword()
-                        )).collect(Collectors.toSet()) : new HashSet<>()
-        );
     }
 
     public static EventModel eventDBOToModel(EventDBO dbo){
@@ -158,4 +76,49 @@ public class EventMapper {
             model.getUserSet() != null ? model.getUserSet().stream()
                     .map(UserMapper.functionUserModelToDBO).collect(Collectors.toSet()) : new HashSet<>()
     );
+
+    public static final Function<EventModel, EventDTO> functionModelToDTO = (EventModel model) ->
+            new EventDTO(
+                    model.getId(),
+                    model.getName().getName(),
+                    model.getDescription().getDescription(),
+                    model.getPlace(),
+                    model.getDate(),
+                    model.getUserSet() != null ? model.getUserSet().stream()
+                            .map(userModel -> new UserDTO(
+                                    userModel.getId(),
+                                    userModel.getUsername().getUsername(),
+                                    userModel.getPassword().getPassword()
+                            )).toList() : new ArrayList<>()
+            );
+
+    public static final Function<EventDTO, EventDBO> functionDTOToDBO = (EventDTO dto) ->
+        new EventDBO(
+                dto.getId(),
+                new EventName(dto.getName()),
+                new EventDescription(dto.getDescription()),
+                dto.getPlace(),
+                dto.getDate(),
+                dto.getUsers() != null ? dto.getUsers().stream()
+                        .map(userDTO -> new UserDBO(
+                                userDTO.getId(),
+                                new Username(userDTO.getUsername()),
+                                new Password(userDTO.getPassword())
+                        )).collect(Collectors.toSet()) : new HashSet<>()
+        );
+
+    public static final Function<EventDBO, EventDTO> functionDBOToDTO = (EventDBO dbo) ->
+            new EventDTO(
+                    dbo.getId(),
+                    dbo.getName().getName(),
+                    dbo.getDescription().getDescription(),
+                    dbo.getPlace(),
+                    dbo.getDate(),
+                    dbo.getUserSet() != null ? dbo.getUserSet().stream()
+                            .map(userDBO -> new UserDTO(
+                                    userDBO.getId(),
+                                    userDBO.getUsername().getUsername(),
+                                    userDBO.getPassword().getPassword()
+                            )).toList() : new ArrayList<>()
+            );
 }

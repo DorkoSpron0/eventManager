@@ -9,7 +9,6 @@ import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import com.ias.eventManagerRun.domain.usecases.UserUseCases;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
-import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepository;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
 import lombok.AllArgsConstructor;
@@ -99,15 +98,31 @@ public class UserMapper {
         );
     }
 
-    public static final Function<UserDTO, UserDBO> functionUserDTOToDBO = UserMapper::userDTOToDBO;
-
-    public static final Function<UserDBO, UserModel> functionToModel = UserMapper::userDBOToModel;
-
-    public static final Function<UserDBO, UserDTO> functionUserDBOToDTO = UserMapper::userDBOToDTO;
-
     public static final Function<UserModel, UserDBO> functionUserModelToDBO = UserMapper::userModelToDBO;
 
     public static final Function<UserDBO, UserModel> functionUserDBOToModel = UserMapper::userDBOToModel;
+
+    public static final Function<UserModel, UserDTO> functionUserModelToDTO =
+            (UserModel model ) -> {
+                return new UserDTO(
+                        model.getId(),
+                        model.getUsername().getUsername(),
+                        model.getPassword().getPassword(),
+                        model.getEventDBOS() != null ? model.getEventDBOS().stream()
+                                .map(EventMapper.functionModelToDTO)
+                                .collect(Collectors.toSet()) : new HashSet<>()
+                );
+            };
+
+    public static final Function<UserDTO, UserDBO> functionDTOToDBO = (UserDTO dto) ->
+            new UserDBO(
+                    dto.getId(),
+                    new Username(dto.getUsername()),
+                    new Password(dto.getPassword()),
+                    dto.getEventDTOS() != null ? dto.getEventDTOS().stream()
+                            .map(EventMapper.functionDTOToDBO).collect(Collectors.toSet()) : new HashSet<>()
+            );
+
 
     public static final Function<UserModel, UserDTO> userModelToDTO = (UserModel model) -> {
         return new UserDTO(
@@ -126,4 +141,12 @@ public class UserMapper {
         );
     };
 
+    public static final Function<UserDBO, UserDTO> functionDBOToDTO = (UserDBO dbo) ->
+            new UserDTO(
+                    dbo.getId(),
+                    dbo.getUsername().getUsername(),
+                    dbo.getPassword().getPassword(),
+                    dbo.getEventDBOS() != null ? dbo.getEventDBOS().stream()
+                            .map(EventMapper.functionDBOToDTO).collect(Collectors.toSet()) : new HashSet<>()
+            );
 }
