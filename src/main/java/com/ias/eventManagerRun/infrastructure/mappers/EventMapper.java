@@ -17,23 +17,6 @@ import java.util.stream.Collectors;
 
 public class EventMapper {
 
-    public static EventModel eventDBOToModel(EventDBO dbo){
-        return new EventModel(
-                dbo.getId(),
-                dbo.getName(),
-                dbo.getDescription(),
-                dbo.getDate(),
-                dbo.getPlace(),
-                dbo.getUserSet() != null ? dbo.getUserSet().stream()
-                        .map(userDBO -> new UserModel(
-                                userDBO.getId(),
-                                userDBO.getUsername(),
-                                userDBO.getPassword())
-                        ).collect(Collectors.toSet()
-                ) : new HashSet<>()
-        );
-    }
-
     public static final Function<EventDBO, EventModel> functionDBOToModel = (EventDBO dbo) ->
             new EventModel(
                 dbo.getId(),

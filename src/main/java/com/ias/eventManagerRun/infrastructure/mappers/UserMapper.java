@@ -17,23 +17,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserMapper {
 
-    public static UserDBO userModelToDBO(UserModel model){
-        return new UserDBO(
-                model.getId(),
-                model.getUsername(),
-                model.getPassword(),
-                model.getEventDBOS() != null ? model.getEventDBOS().stream()
-                        .map(eventModel -> new EventDBO(
-                                eventModel.getDate(),
-                                eventModel.getDescription(),
-                                eventModel.getId(),
-                                eventModel.getName(),
-                                eventModel.getPlace()
-                        )
-                ).collect(Collectors.toSet()) : new HashSet<>()
-        );
-    }
-
     public static final Function<UserModel, UserDBO> functionUserModelToDBO = (UserModel model) -> new UserDBO(
             model.getId(),
             model.getUsername(),

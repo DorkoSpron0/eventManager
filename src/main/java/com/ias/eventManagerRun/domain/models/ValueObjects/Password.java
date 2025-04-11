@@ -3,6 +3,7 @@ package com.ias.eventManagerRun.domain.models.ValueObjects;
 import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import org.springframework.security.core.parameters.P;
 
 import java.util.Objects;
 
@@ -16,7 +17,6 @@ public class Password {
     }
 
     public Password(String password) {
-        if(!password.matches("^[a-zA-Z ]{2,}")) throw new IllegalArgumentException("Password invalid");
         this.password = password;
     }
 

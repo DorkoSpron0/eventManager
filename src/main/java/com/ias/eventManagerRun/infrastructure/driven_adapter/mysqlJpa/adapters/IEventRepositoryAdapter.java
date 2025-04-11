@@ -8,6 +8,7 @@ import com.ias.eventManagerRun.domain.usecases.EventUseCases;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IEventRepository;
 import com.ias.eventManagerRun.infrastructure.mappers.EventMapper;
 import com.ias.eventManagerRun.infrastructure.mappers.UserMapper;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,15 +30,14 @@ public class IEventRepositoryAdapter implements EventUseCases {
     private final Function<EventModel, EventModel> saveModel =
             EventMapper.functionModelToDBO
                     .andThen(eventDBO -> eventRepository.save(eventDBO))
-                    .andThen(eventDBO -> EventMapper.eventDBOToModel(eventDBO));
+                    .andThen(eventDBO -> EventMapper.functionDBOToModel.apply(eventDBO));
 
-    // NO ES COMPUESTA
-    private final Function<UUID, EventModel> findById =
-            (UUID id) -> EventMapper.functionDBOToModel.apply(
-                    eventRepository.findById(id)
-                            .orElseThrow(() -> new IllegalArgumentException("Event not found"))
-            );
+    private final Function<UUID, EventDBO> findEventDBOById =
+            id -> eventRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Event not found"));
 
+    private final Function<UUID, UserDBO> findUserDBOById =
+            (UUID id) -> UserMapper.functionUserModelToDBO.apply(userService.findById(id));
 
     private final BiFunction<EventDBO, EventModel, EventDBO> updateEvent =
             (EventDBO eventDBOFounded, EventModel model) -> {
@@ -46,6 +46,7 @@ public class IEventRepositoryAdapter implements EventUseCases {
                 eventDBOFounded.setDate(model.getDate());
                 eventDBOFounded.setDescription(model.getDescription());
 
+                // Mantener la lista de usuarios actual sin modificarla
                 eventDBOFounded.setUserSet(eventDBOFounded.getUserSet());
                 return eventDBOFounded;
             };
@@ -58,6 +59,7 @@ public class IEventRepositoryAdapter implements EventUseCases {
                 .toList();
     }
 
+    @Transactional
     @Override
     public EventModel registerEvent(EventModel event) {
         return saveModel.apply(event);
@@ -65,23 +67,24 @@ public class IEventRepositoryAdapter implements EventUseCases {
 
     @Override
     public EventModel getEventById(UUID id) {
-        return findById.apply(id);
+        return EventMapper.functionDBOToModel.apply(findEventDBOById.apply(id));
     }
 
+    @Transactional
     @Override
     public EventModel updateEventById(UUID id, EventModel eventModel) {
-        EventDBO eventDBOFounded = EventMapper.functionModelToDBO.apply(findById.apply(id));
+        EventDBO eventDBOFounded = findEventDBOById.apply(id);
 
-        // Actualizamos solo los campos del evento
         eventDBOFounded = updateEvent.apply(eventDBOFounded, eventModel);
 
         return EventMapper.functionDBOToModel.apply(eventRepository.save(eventDBOFounded));
     }
 
+    @Transactional
     @Override
     public String registerUserToEvent(UUID event_id, UUID user_id) {
-        EventDBO eventDBOFounded = EventMapper.functionModelToDBO.apply(getEventById(event_id));
-        UserDBO userDBOFounded = UserMapper.functionUserModelToDBO.apply(userService.findById(user_id));
+        EventDBO eventDBOFounded = findEventDBOById.apply(event_id);
+        UserDBO userDBOFounded = findUserDBOById.apply(user_id);
 
         eventDBOFounded.getUserSet().add(userDBOFounded);
 
@@ -92,15 +95,16 @@ public class IEventRepositoryAdapter implements EventUseCases {
 
     @Override
     public Set<EventModel> getAllEventByUser(UUID user_id) {
-        UserDBO userDBOFounded = UserMapper.functionUserModelToDBO.apply(userService.findById(user_id));
+        UserDBO userDBOFounded = findUserDBOById.apply(user_id);
 
         return userDBOFounded.getEventDBOS().stream().map(EventMapper.functionDBOToModel).collect(Collectors.toSet());
     }
 
+    @Transactional
     @Override
     public String removeEvent(UUID id) {
-        eventRepository.delete(EventMapper.functionModelToDBO.apply(getEventById(id)));
+        eventRepository.delete(findEventDBOById.apply(id));
 
-        return "Event with id " + id + " removes successfully";
+        return "Event with id " + id + " removed successfully";
     }
 }
