@@ -8,7 +8,6 @@ import com.ias.eventManagerRun.domain.models.ValueObjects.Password;
 import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
-import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters.IEventRepositoryAdapter;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
 
@@ -17,27 +16,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class EventMapper {
-
-    public static Set<EventDTO> setOfEventDTOFromEventServiceWithEventWithoutUsers(IEventRepositoryAdapter eventService, UUID id){
-        return Optional.ofNullable(eventService.getAllEventByUser(id))
-                .orElse(new HashSet<>())
-                .stream()
-                .map(eventDBO -> new EventDTO(
-                                eventDBO.getId(),
-                                eventDBO.getName().getName(),
-                                eventDBO.getDescription().getDescription(),
-                                eventDBO.getPlace(),
-                                eventDBO.getDate(),
-                                eventDBO.getUserSet() != null ? eventDBO.getUserSet().stream()
-                                        .map(userDBO -> new UserDTO(
-                                                        userDBO.getId(),
-                                                        userDBO.getUsername().getUsername(),
-                                                        userDBO.getPassword().getPassword()
-                                                )
-                                        ).toList() : new ArrayList<>()
-                        )
-                ).collect(Collectors.toSet());
-    }
 
     public static EventModel eventDBOToModel(EventDBO dbo){
         return new EventModel(
@@ -64,7 +42,8 @@ public class EventMapper {
                 dbo.getDate(),
                 dbo.getPlace(),
                 dbo.getUserSet() != null ? dbo.getUserSet().stream()
-                        .map(UserMapper.functionUserDBOToModel).collect(Collectors.toSet()) : new HashSet<>()
+                        .map(UserMapper.functionUserDBOToModel)
+                        .collect(Collectors.toSet()) : new HashSet<>()
         );
 
     public static final Function<EventModel, EventDBO> functionModelToDBO = (EventModel model) -> new EventDBO(

@@ -17,22 +17,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserMapper {
 
-    public static UserModel userDBOToModel(UserDBO dbo){
-        return new UserModel(
-                dbo.getId(),
-                dbo.getUsername(),
-                dbo.getPassword(),
-                dbo.getEventDBOS() != null ? dbo.getEventDBOS().stream()
-                        .map(eventDBO -> new EventModel(
-                                eventDBO.getId(),
-                                eventDBO.getName(),
-                                eventDBO.getDescription(),
-                                eventDBO.getDate(),
-                                eventDBO.getPlace()
-                        )).collect(Collectors.toSet()) : new HashSet<>()
-        );
-    }
-
     public static UserDBO userModelToDBO(UserModel model){
         return new UserDBO(
                 model.getId(),
@@ -50,9 +34,34 @@ public class UserMapper {
         );
     }
 
-    public static final Function<UserModel, UserDBO> functionUserModelToDBO = UserMapper::userModelToDBO;
+    public static final Function<UserModel, UserDBO> functionUserModelToDBO = (UserModel model) -> new UserDBO(
+            model.getId(),
+            model.getUsername(),
+            model.getPassword(),
+            model.getEventDBOS() != null ? model.getEventDBOS().stream()
+                    .map(eventModel -> new EventDBO(
+                            eventModel.getDate(),
+                            eventModel.getDescription(),
+                            eventModel.getId(),
+                            eventModel.getName(),
+                            eventModel.getPlace()
+                    )).collect(Collectors.toSet()) : new HashSet<>()
+    );
 
-    public static final Function<UserDBO, UserModel> functionUserDBOToModel = UserMapper::userDBOToModel;
+    public static final Function<UserDBO, UserModel> functionUserDBOToModel = (UserDBO dbo) ->
+            new UserModel(
+                    dbo.getId(),
+                    dbo.getUsername(),
+                    dbo.getPassword(),
+                    dbo.getEventDBOS() != null ? dbo.getEventDBOS().stream()
+                            .map(eventDBO -> new EventModel(
+                                    eventDBO.getId(),
+                                    eventDBO.getName(),
+                                    eventDBO.getDescription(),
+                                    eventDBO.getDate(),
+                                    eventDBO.getPlace()
+                            )).collect(Collectors.toSet()) : new HashSet<>()
+            );
 
     public static final Function<UserModel, UserDTO> functionUserModelToDTO =
             (UserModel model ) ->

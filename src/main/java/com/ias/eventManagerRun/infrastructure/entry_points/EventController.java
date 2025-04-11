@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/iasapi/events")
@@ -104,8 +105,8 @@ public class EventController {
     public ResponseEntity<?> getAllEventForUser(@PathVariable UUID id){
         try{
 
-            /* RETURN DTO */
-            Set<EventDTO> dtos = EventMapper.setOfEventDTOFromEventServiceWithEventWithoutUsers(eventService, id);
+            Set<EventDTO> dtos = eventService.getAllEventByUser(id).stream()
+                    .map(eventModel -> EventMapper.functionModelToDTO.apply(eventModel)).collect(Collectors.toSet());
 
             return ResponseEntity.status(HttpStatus.OK).body(dtos);
         }catch (IllegalArgumentException e){

@@ -58,10 +58,10 @@ public class IUserRepositoryAdapter implements UserUseCases {
     }
 
     @Override
-    public String loginUser(UserModel userDBO) {
-        UserDBO userDBOFounded = UserMapper.userModelToDBO(findByUsername(userDBO.getUsername().getUsername()));
+    public String loginUser(UserModel userModel) {
+        UserDBO userDBOFounded = UserMapper.functionUserModelToDBO.apply(findByUsername(userModel.getUsername().getUsername()));
 
-        if(userDBO.getPassword().equals(userDBOFounded.getPassword())){
+        if(userModel.getPassword().equals(userDBOFounded.getPassword())){
             return jwtService.generateToken(userDBOFounded.getUsername().getUsername());
         }
 
