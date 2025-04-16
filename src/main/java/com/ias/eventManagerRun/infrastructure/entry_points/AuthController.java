@@ -19,7 +19,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserDBO user){
         try{
-            return ResponseEntity.status(HttpStatus.OK).body(userService.loginUser(UserMapper.functionUserDBOToModel.apply(user)));
+            return ResponseEntity.status(HttpStatus.OK).body(userService.loginUser(UserMapper.userDBOToModel(user)));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

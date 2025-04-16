@@ -25,7 +25,7 @@ public class EventController {
     public ResponseEntity<?> getAllEvents(){
         try{
             List<EventDTO> eventDTOS = eventService.getAllEvents().stream()
-                    .map(EventMapper.functionModelToDTO).toList();
+                    .map(EventMapper::eventModelTODTO).toList();
 
             return ResponseEntity.status(HttpStatus.OK).body(eventDTOS);
         }catch (Exception e){
@@ -36,9 +36,9 @@ public class EventController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getEventById(@PathVariable UUID id){
         try{
-            EventDBO dbo = EventMapper.functionModelToDBO.apply(eventService.getEventById(id));
+            EventDBO dbo = EventMapper.eventModelToDBO(eventService.getEventById(id));
 
-            EventDTO dtos = EventMapper.functionDBOToDTO.apply(dbo);
+            EventDTO dtos = EventMapper.eventDBOToDTO(dbo);
 
             return ResponseEntity.status(HttpStatus.OK).body(dtos);
         }catch (IllegalArgumentException e){
@@ -53,9 +53,9 @@ public class EventController {
         try{
 
             /* Al momento de registrar un evento no se le pasan usuarios */
-            EventDBO dbo = EventMapper.functionDTOToDBO.apply(event);
+            EventDBO dbo = EventMapper.eventDTOToDBO(event);
 
-            EventDBO eventDBO = EventMapper.functionModelToDBO.apply(eventService.registerEvent(EventMapper.functionDBOToModel.apply(dbo)));
+            EventDBO eventDBO = EventMapper.eventModelToDBO(eventService.registerEvent(EventMapper.eventDBOToModel(dbo)));
             event.setId(eventDBO.getId());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(event);
@@ -68,10 +68,10 @@ public class EventController {
     public ResponseEntity<?> updateEvent(@PathVariable UUID id,@Valid @RequestBody EventDTO event){
         try{
 
-            EventDBO dbo = EventMapper.functionDTOToDBO.apply(event);
+            EventDBO dbo = EventMapper.eventDTOToDBO(event);
 
             // TODO - RETURN AN DTO
-            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, EventMapper.functionDBOToModel.apply(dbo)));
+            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, EventMapper.eventDBOToModel(dbo)));
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }catch (Exception e){
@@ -106,7 +106,7 @@ public class EventController {
         try{
 
             Set<EventDTO> dtos = eventService.getAllEventByUser(id).stream()
-                    .map(eventModel -> EventMapper.functionModelToDTO.apply(eventModel)).collect(Collectors.toSet());
+                    .map(EventMapper::eventModelTODTO).collect(Collectors.toSet());
 
             return ResponseEntity.status(HttpStatus.OK).body(dtos);
         }catch (IllegalArgumentException e){

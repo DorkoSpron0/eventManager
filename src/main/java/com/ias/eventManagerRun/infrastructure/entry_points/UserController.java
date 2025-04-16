@@ -23,7 +23,7 @@ public class UserController {
     public ResponseEntity<?> getAllUser(){
         try{
             //List<UserDBO> userList = userUseCases.getAllUsers();
-            List<UserDTO> dtos = userUseCases.getAllUsers().stream().map(UserMapper.functionUserModelToDTO).toList();
+            List<UserDTO> dtos = userUseCases.getAllUsers().stream().map(UserMapper::userModelToDTO).toList();
 
             return ResponseEntity.status(HttpStatus.OK).body(dtos);
         }catch (Exception e){
@@ -34,11 +34,11 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTO user){
         try{
-            UserDBO userDBO = UserMapper.functionDTOToDBO.apply(user);
+            UserDBO userDBO = UserMapper.userDTOTODBO(user);
 
-            UserDBO dbo = UserMapper.functionUserModelToDBO.apply(userUseCases.registerUser(UserMapper.functionUserDBOToModel.apply(userDBO)));
+            UserDBO dbo = UserMapper.userModelToDBO(userUseCases.registerUser(UserMapper.userDBOToModel(userDBO)));
 
-            UserDTO dto = UserMapper.functionDBOToDTO.apply(dbo);
+            UserDTO dto = UserMapper.userDBoToDTO(dbo);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(dto);
         }catch (Exception e){

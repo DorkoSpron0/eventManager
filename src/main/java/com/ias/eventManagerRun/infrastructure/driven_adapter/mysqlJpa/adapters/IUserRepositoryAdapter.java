@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
@@ -25,51 +24,33 @@ public class IUserRepositoryAdapter implements UserUseCases {
     private JwtService jwtService;
     private PasswordEncoder passwordEncoder;
 
-    private final Function<UserModel, UserModel> hashPassword = (UserModel model) -> {
-        String rawPassword = model.getPassword().getPassword();
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-        model.setPassword(new Password(encodedPassword));
-        return model;
-    };
-
-    private final Function<UserModel, UserModel> saveUser =
-            hashPassword // primero la cifra
-                    .andThen(UserMapper.functionUserModelToDBO)
-                    .andThen(userDBO -> userRepository.save(userDBO))
-                    .andThen(UserMapper.functionUserDBOToModel);
-
-    // FIND BY ID
-    private final Function<UUID, UserDBO> findUserDBOById =
-            id -> userRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-    // FIND BY USERNAME
-    private final Function<String, UserDBO> findUserDBOByUsername =
-            (String username) -> userRepository.findByUsername_Username(username).orElseThrow(() -> new UsernameNotFoundException("Username '" + username + "' not found"));
-
     @Override
     public List<UserModel> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(UserMapper.functionUserDBOToModel)
+                .map(UserMapper::userDBOToModel)
                 .toList();
     }
 
-    @Transactional
+    @Transactional // Si algo falla hace rollback y no persiste los cambios
     @Override
     public UserModel registerUser(UserModel user) {
-        return saveUser.apply(user);
+        user.setPassword(new Password(passwordEncoder.encode(user.getPassword().getPassword())));
+
+        UserDBO userDBO = UserMapper.userModelToDBO(user);
+        return UserMapper.userDBOToModel(userRepository.save(userDBO));
     }
 
     @Override
     public UserModel findById(UUID id) {
-        return UserMapper.functionUserDBOToModel.apply(findUserDBOById.apply(id));
+        return UserMapper.userDBOToModel(userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found")));
     }
 
     @Override
     public String loginUser(UserModel userModel) {
-        UserDBO userDBOFounded = findUserDBOByUsername.apply(userModel.getUsername().getUsername());
+        UserDBO userDBOFounded = userRepository.findByUsername_Username(userModel.getUsername().getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username '" + userModel.getUsername().getUsername() + "' not found"));
 
+        // TODO - REFACTOR TO ANOTHER FUNCTION
         if(passwordEncoder.matches(userModel.getPassword().getPassword(), userDBOFounded.getPassword().getPassword())){
             return jwtService.generateToken(userDBOFounded.getUsername().getUsername());
         }
@@ -79,6 +60,6 @@ public class IUserRepositoryAdapter implements UserUseCases {
 
     @Override
     public UserModel findByUsername(String username) {
-        return UserMapper.functionUserDBOToModel.apply(findUserDBOByUsername.apply(username));
+        return UserMapper.userDBOToModel(userRepository.findByUsername_Username(username).orElseThrow(() -> new UsernameNotFoundException("Username '" + username + "' not found")));
     }
 }
