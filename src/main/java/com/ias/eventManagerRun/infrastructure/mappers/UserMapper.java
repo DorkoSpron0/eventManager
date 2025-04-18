@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 
 
-@AllArgsConstructor
 public class UserMapper {
 
     public static UserDBO userModelToDBO(UserModel model) {
