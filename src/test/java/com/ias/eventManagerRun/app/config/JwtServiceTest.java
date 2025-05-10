@@ -9,12 +9,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cglib.core.Local;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -51,6 +54,12 @@ public class JwtServiceTest {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 3600000))
                 .compact();
+    }
+
+    @AfterEach
+    void clean() {
+        reset(userRepository);
+        SecurityContextHolder.clearContext(); // Esto limpia la autenticación entre tests
     }
 
     @Test
@@ -156,4 +165,53 @@ public class JwtServiceTest {
             this.jwtService.doFilterInternal(request, response, filterChain);
         });
     }
+
+    @Test
+    public void doFilterInternalWithUsernameNull() throws ServletException, IOException {
+        // Given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String tokenSinSubject = Jwts.builder()
+                .claim("role", "USER")
+                .signWith(SECRET_KEY)
+                .compact();
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tokenSinSubject);
+
+        // SUT: el filtro que estás probando
+
+        // When: ejecutamos el filtro
+        this.jwtService.doFilterInternal(request, response, filterChain);
+
+        // Then: verificamos que sí se llamó a filterChain.doFilter
+        verify(filterChain).doFilter(request, response);
+        assertNull(SecurityContextHolder.getContext().getAuthentication()); // -> Se verifica que no haya creado la "sesion"
+    }
+
+    @Test
+    public void doFilterInternalWithAuthenticationAlreadyPresent() throws ServletException, IOException {
+        // Given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        // Simular un token válido o inválido, no importa porque ya hay auth
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + this.validToken);
+
+        // Simula que ya existe autenticación en el contexto
+        Authentication mockAuth = mock(Authentication.class);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(mockAuth);
+        SecurityContextHolder.setContext(context);
+
+        // When
+        this.jwtService.doFilterInternal(request, response, filterChain);
+
+        // Then
+        verify(filterChain).doFilter(request, response); // Verifica que se dejó pasar
+    }
+
+
 }
