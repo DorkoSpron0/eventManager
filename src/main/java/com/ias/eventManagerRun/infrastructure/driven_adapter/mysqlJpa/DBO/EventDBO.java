@@ -1,7 +1,5 @@
 package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO;
 
-import com.ias.eventManagerRun.domain.models.ValueObjects.EventDescription;
-import com.ias.eventManagerRun.domain.models.ValueObjects.EventName;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -23,11 +20,9 @@ public class EventDBO {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Embedded
-    private EventName name;
+    private String name;
 
-    @Embedded
-    private EventDescription description;
+    private String description;
 
     @Column(name = "place", nullable = false)
     private String place;
@@ -39,20 +34,13 @@ public class EventDBO {
     @JoinTable(name = "event_user", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     Set<UserDBO> userSet = new HashSet<>();
 
-    public EventDBO(LocalDate date, EventDescription description, UUID id, EventName name, String place) {
-        this.date = date;
-        this.description = description;
+    public EventDBO(UUID id, String name, String description, String place, LocalDate date, Set<UserDBO> userSet) {
         this.id = id;
         this.name = name;
-        this.place = place;
-    }
-
-    public EventDBO(EventName name, EventDescription description, String place, LocalDate date, Set<UserDBO> userDBOSet) {
-        this.name = name;
         this.description = description;
         this.place = place;
         this.date = date;
-        this.userSet = userDBOSet;
+        this.userSet = userSet;
     }
 
     @Override

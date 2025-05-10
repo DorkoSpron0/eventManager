@@ -1,8 +1,6 @@
 package com.ias.eventManagerRun.app.config;
 
-import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepository;
-import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters.IUserRepositoryAdapter;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
@@ -58,7 +56,7 @@ public class JwtService extends OncePerRequestFilter {
             return;
         }
 
-        if(userRepository.findByUsername_Username(username).isEmpty()){
+        if(userRepository.findByUsername(username).isEmpty()){
             throw new UsernameNotFoundException("Not found");
         }
 

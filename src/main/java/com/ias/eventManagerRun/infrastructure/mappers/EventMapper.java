@@ -8,79 +8,92 @@ import com.ias.eventManagerRun.domain.models.ValueObjects.Password;
 import com.ias.eventManagerRun.domain.models.ValueObjects.Username;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
-import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
-import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
+import com.ias.eventManagerRun.infrastructure.entry_points.DTO.request.EventDTO;
+import com.ias.eventManagerRun.infrastructure.entry_points.DTO.response.EventResponseInfo;
+import com.ias.eventManagerRun.infrastructure.entry_points.DTO.response.UserResponseInfo;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class EventMapper {
-
-    public static final Function<EventDBO, EventModel> functionDBOToModel = (EventDBO dbo) ->
-            new EventModel(
-                dbo.getId(),
-                dbo.getName(),
-                dbo.getDescription(),
-                dbo.getDate(),
-                dbo.getPlace(),
-                dbo.getUserSet() != null ? dbo.getUserSet().stream()
-                        .map(UserMapper.functionUserDBOToModel)
-                        .collect(Collectors.toSet()) : new HashSet<>()
-        );
-
-    public static final Function<EventModel, EventDBO> functionModelToDBO = (EventModel model) -> new EventDBO(
-            model.getId(),
-            model.getName(),
-            model.getDescription(),
-            model.getPlace(),
-            model.getDate(),
-            model.getUserSet() != null ? model.getUserSet().stream()
-                    .map(UserMapper.functionUserModelToDBO).collect(Collectors.toSet()) : new HashSet<>()
+    public static final Function<EventModel, EventDBO> eventModelToDBO = (EventModel model) -> new EventDBO(
+            model.id(),
+            model.name().value(),
+            model.description().value(),
+            model.place(),
+            model.date(),
+            Set.copyOf(
+                    Optional.ofNullable(model.userModels())
+                            .orElse(Set.of())
+                            .stream()
+                            .map(user -> new UserDBO(
+                                    user.id(),
+                                    user.username().value(),
+                                    user.password().value(),
+                                    Set.of()
+                            ))
+                            .collect(Collectors.toSet())
+            )
     );
 
-    public static final Function<EventModel, EventDTO> functionModelToDTO = (EventModel model) ->
-            new EventDTO(
-                    model.getId(),
-                    model.getName().getName(),
-                    model.getDescription().getDescription(),
-                    model.getPlace(),
-                    model.getDate(),
-                    model.getUserSet() != null ? model.getUserSet().stream()
-                            .map(userModel -> new UserDTO(
-                                    userModel.getId(),
-                                    userModel.getUsername().getUsername(),
-                                    userModel.getPassword().getPassword()
-                            )).toList() : new ArrayList<>()
-            );
+    public static final Function<EventDBO, EventModel> eventDBOToModel = (EventDBO dbo) -> new EventModel(
+            dbo.getId(),
+            new EventName(dbo.getName()),
+            new EventDescription(dbo.getDescription()),
+            dbo.getPlace(),
+            dbo.getDate(),
+            Set.copyOf(
+                    Optional.ofNullable(dbo.getUserSet())
+                            .orElse(Set.of())
+                            .stream()
+                            .map(user -> new UserModel(
+                                    user.getId(),
+                                    new Username(user.getUsername()),
+                                    new Password(user.getPassword()),
+                                    Set.of()
+                            ))
+                            .collect(Collectors.toSet())
+            )
+    );
 
-    public static final Function<EventDTO, EventDBO> functionDTOToDBO = (EventDTO dto) ->
-        new EventDBO(
-                dto.getId(),
-                new EventName(dto.getName()),
-                new EventDescription(dto.getDescription()),
-                dto.getPlace(),
-                dto.getDate(),
-                dto.getUsers() != null ? dto.getUsers().stream()
-                        .map(userDTO -> new UserDBO(
-                                userDTO.getId(),
-                                new Username(userDTO.getUsername()),
-                                new Password(userDTO.getPassword())
-                        )).collect(Collectors.toSet()) : new HashSet<>()
-        );
+    public static final Function<EventModel, EventResponseInfo> eventModelToResponse = (EventModel model) -> new EventResponseInfo(
+            model.id(),
+            model.name().value(),
+            model.description().value(),
+            model.place(),
+            model.date(),
+            Set.copyOf(
+                    Optional.ofNullable(model.userModels())
+                            .orElse(Set.of())
+                            .stream()
+                            .map(user -> new UserResponseInfo(
+                                    user.id(),
+                                    user.username().value(),
+                                    user.password().value(),
+                                    Set.of()
+                            ))
+                            .collect(Collectors.toSet())
+            )
+    );
 
-    public static final Function<EventDBO, EventDTO> functionDBOToDTO = (EventDBO dbo) ->
-            new EventDTO(
-                    dbo.getId(),
-                    dbo.getName().getName(),
-                    dbo.getDescription().getDescription(),
-                    dbo.getPlace(),
-                    dbo.getDate(),
-                    dbo.getUserSet() != null ? dbo.getUserSet().stream()
-                            .map(userDBO -> new UserDTO(
-                                    userDBO.getId(),
-                                    userDBO.getUsername().getUsername(),
-                                    userDBO.getPassword().getPassword()
-                            )).toList() : new ArrayList<>()
-            );
+    public static final Function<EventDTO, EventModel> eventDTORequestToModel = (EventDTO dto) -> new EventModel(
+            dto.id(),
+            new EventName(dto.name()),
+            new EventDescription(dto.description()),
+            dto.place(),
+            dto.date(),
+            Set.copyOf(
+                    Optional.ofNullable(dto.users())
+                            .orElse(Set.of())
+                            .stream()
+                            .map(user -> new UserModel(
+                                    user.id(),
+                                    new Username(user.username()),
+                                    new Password(user.password()),
+                                    Set.of()
+                            ))
+                            .collect(Collectors.toSet())
+            )
+    );
 }

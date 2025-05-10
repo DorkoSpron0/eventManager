@@ -21,27 +21,21 @@ public class UserDBO {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Embedded
-    private Username username;
+    @Column(nullable = false)
+    private String username;
 
-    @Embedded
-    private Password password;
+    @Column(nullable = false)
+    private String password;
 
     @ManyToMany(mappedBy = "userSet", cascade = CascadeType.ALL)
     @JsonIgnore
     Set<EventDBO> eventDBOS = new HashSet<>();
 
-    public UserDBO(Set<EventDBO> eventDBOS, Username username, Password password, UUID id) {
+    public UserDBO(Set<EventDBO> eventDBOS, String username, String password, UUID id) {
         this.eventDBOS = eventDBOS;
         this.username = username;
         this.password = password;
         this.id = id;
-    }
-
-    public UserDBO(UUID id, Username username, Password password) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
     }
 
     @Override

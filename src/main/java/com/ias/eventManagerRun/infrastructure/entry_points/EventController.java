@@ -1,9 +1,9 @@
 package com.ias.eventManagerRun.infrastructure.entry_points;
 
-import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
-import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters.IEventRepositoryAdapter;
-import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
-import com.ias.eventManagerRun.infrastructure.entry_points.DTO.registerUserToEventDTO;
+import com.ias.eventManagerRun.domain.models.EventModel;
+import com.ias.eventManagerRun.domain.usecases.EventUseCases;
+import com.ias.eventManagerRun.infrastructure.entry_points.DTO.request.registerUserToEventDTO;
+import com.ias.eventManagerRun.infrastructure.entry_points.DTO.request.EventDTO;
 import com.ias.eventManagerRun.infrastructure.mappers.EventMapper;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -12,107 +12,93 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/iasapi/events")
 @AllArgsConstructor
 public class EventController {
 
-    private IEventRepositoryAdapter eventService;
+    private EventUseCases eventUseCases;
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<?> getAllEvents(){
-        try{
-            List<EventDTO> eventDTOS = eventService.getAllEvents().stream()
-                    .map(EventMapper.functionModelToDTO).toList();
-
-            return ResponseEntity.status(HttpStatus.OK).body(eventDTOS);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(this.eventUseCases.getAllEvents().get().stream().map(EventMapper.eventModelToResponse));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEventById(@PathVariable UUID id){
-        try{
-            EventDBO dbo = EventMapper.functionModelToDBO.apply(eventService.getEventById(id));
+    public ResponseEntity<Object> getEventById(@PathVariable UUID id) {
+        Optional<EventModel> optionalEvent = eventUseCases.getEventById().apply(id);
 
-            EventDTO dtos = EventMapper.functionDBOToDTO.apply(dbo);
-
-            return ResponseEntity.status(HttpStatus.OK).body(dtos);
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        if (optionalEvent.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
         }
+
+        EventModel founded = optionalEvent.get();
+
+        return ResponseEntity.ok(EventMapper.eventModelToResponse.apply(founded));
     }
 
     @PostMapping
     public ResponseEntity<?> registerEvent(@Valid @RequestBody EventDTO event){
-        try{
 
-            /* Al momento de registrar un evento no se le pasan usuarios */
-            EventDBO dbo = EventMapper.functionDTOToDBO.apply(event);
+        EventModel model = EventMapper.eventDTORequestToModel.apply(event);
+        Optional<EventModel> eventOpt = this.eventUseCases.registerEvent().apply(model);
 
-            EventDBO eventDBO = EventMapper.functionModelToDBO.apply(eventService.registerEvent(EventMapper.functionDBOToModel.apply(dbo)));
-            event.setId(eventDBO.getId());
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(event);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        if(eventOpt.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Credenciales incorrectas");
         }
+
+        EventModel saved = eventOpt.get();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(EventMapper.eventModelToResponse.apply(saved));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEvent(@PathVariable UUID id,@Valid @RequestBody EventDTO event){
-        try{
+        EventModel model = EventMapper.eventDTORequestToModel.apply(event);
+        Optional<EventModel> eventOpt = this.eventUseCases.updateEventById().apply(id, model);
 
-            EventDBO dbo = EventMapper.functionDTOToDBO.apply(event);
-
-            // TODO - RETURN AN DTO
-            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, EventMapper.functionDBOToModel.apply(dbo)));
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        if(eventOpt.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
         }
+
+        EventModel updated = eventOpt.get();
+
+        return ResponseEntity.status(HttpStatus.OK).body(EventMapper.eventModelToResponse.apply(updated));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable UUID id){
-        try{
-            return ResponseEntity.status(HttpStatus.OK).body(eventService.removeEvent(id));
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        Optional<String> eventOpt = this.eventUseCases.removeEvent().apply(id);
+
+        if(eventOpt.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event not found");
         }
+
+        return ResponseEntity.status(HttpStatus.OK).body("Event removed successfully");
     }
 
     @PostMapping("/{id}/register")
     public ResponseEntity<?> registerUserToEvent(@PathVariable UUID id, @Valid @RequestBody registerUserToEventDTO user){
-        try{
-            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.registerUserToEvent(id, user.getUserId()));
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        Optional<String> stringOpt = this.eventUseCases.registerUserToEvent().apply(user.userId(), id);
+
+        if(stringOpt.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Credenciales incorrectas");
         }
+
+        return ResponseEntity.status(HttpStatus.OK).body(stringOpt.get());
     }
 
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getAllEventForUser(@PathVariable UUID id){
-        try{
+        Optional<Set<EventModel>> eventsOpt = this.eventUseCases.getAllEventByUserId().apply(id);
 
-            Set<EventDTO> dtos = eventService.getAllEventByUser(id).stream()
-                    .map(eventModel -> EventMapper.functionModelToDTO.apply(eventModel)).collect(Collectors.toSet());
-
-            return ResponseEntity.status(HttpStatus.OK).body(dtos);
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        if(eventsOpt.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
+
+        Set<EventModel> events = eventsOpt.get();
+
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(EventMapper.eventModelToResponse));
     }
 }
