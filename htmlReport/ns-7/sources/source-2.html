@@ -44,26 +44,26 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name">EventController</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/8)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/42)
+    (42/42)
   </span>
 </td>
 </tr>
@@ -93,7 +93,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;@RestController
 &nbsp;@RequestMapping(&quot;/iasapi/events&quot;)
-<b class="nc">&nbsp;@AllArgsConstructor</b>
+<b class="fc">&nbsp;@AllArgsConstructor</b>
 &nbsp;public class EventController {
 &nbsp;
 &nbsp;    private IEventRepositoryAdapter eventService;
@@ -101,27 +101,27 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    @GetMapping(&quot;&quot;)
 &nbsp;    public ResponseEntity&lt;?&gt; getAllEvents(){
 &nbsp;        try{
-<b class="nc">&nbsp;            List&lt;EventDTO&gt; eventDTOS = eventService.getAllEvents().stream()</b>
-<b class="nc">&nbsp;                    .map(EventMapper::eventModelTODTO).toList();</b>
+<b class="fc">&nbsp;            List&lt;EventDTO&gt; eventDTOS = eventService.getAllEvents().stream()</b>
+<b class="fc">&nbsp;                    .map(EventMapper::eventModelTODTO).toList();</b>
 &nbsp;
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.OK).body(eventDTOS);</b>
-<b class="nc">&nbsp;        }catch (Exception e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.OK).body(eventDTOS);</b>
+<b class="fc">&nbsp;        }catch (Exception e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    @GetMapping(&quot;/{id}&quot;)
 &nbsp;    public ResponseEntity&lt;?&gt; getEventById(@PathVariable UUID id){
 &nbsp;        try{
-<b class="nc">&nbsp;            EventDBO dbo = EventMapper.eventModelToDBO(eventService.getEventById(id));</b>
+<b class="fc">&nbsp;            EventDBO dbo = EventMapper.eventModelToDBO(eventService.getEventById(id));</b>
 &nbsp;
-<b class="nc">&nbsp;            EventDTO dtos = EventMapper.eventDBOToDTO(dbo);</b>
+<b class="fc">&nbsp;            EventDTO dtos = EventMapper.eventDBOToDTO(dbo);</b>
 &nbsp;
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.OK).body(dtos);</b>
-<b class="nc">&nbsp;        }catch (IllegalArgumentException e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
-<b class="nc">&nbsp;        }catch (Exception e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.OK).body(dtos);</b>
+<b class="fc">&nbsp;        }catch (IllegalArgumentException e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+<b class="fc">&nbsp;        }catch (Exception e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -130,14 +130,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        try{
 &nbsp;
 &nbsp;            /* Al momento de registrar un evento no se le pasan usuarios */
-<b class="nc">&nbsp;            EventDBO dbo = EventMapper.eventDTOToDBO(event);</b>
+<b class="fc">&nbsp;            EventDBO dbo = EventMapper.eventDTOToDBO(event);</b>
 &nbsp;
-<b class="nc">&nbsp;            EventDBO eventDBO = EventMapper.eventModelToDBO(eventService.registerEvent(EventMapper.eventDBOToModel(dbo)));</b>
-<b class="nc">&nbsp;            event.setId(eventDBO.getId());</b>
+<b class="fc">&nbsp;            EventDBO eventDBO = EventMapper.eventModelToDBO(eventService.registerEvent(EventMapper.eventDBOToModel(dbo)));</b>
+<b class="fc">&nbsp;            event.setId(eventDBO.getId());</b>
 &nbsp;
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.CREATED).body(event);</b>
-<b class="nc">&nbsp;        }catch (Exception e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.CREATED).body(event);</b>
+<b class="fc">&nbsp;        }catch (Exception e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -145,36 +145,36 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    public ResponseEntity&lt;?&gt; updateEvent(@PathVariable UUID id,@Valid @RequestBody EventDTO event){
 &nbsp;        try{
 &nbsp;
-<b class="nc">&nbsp;            EventDBO dbo = EventMapper.eventDTOToDBO(event);</b>
+<b class="fc">&nbsp;            EventDBO dbo = EventMapper.eventDTOToDBO(event);</b>
 &nbsp;
 &nbsp;            // TODO - RETURN AN DTO
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, EventMapper.eventDBOToModel(dbo)));</b>
-<b class="nc">&nbsp;        }catch (IllegalArgumentException e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
-<b class="nc">&nbsp;        }catch (Exception e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.updateEventById(id, EventMapper.eventDBOToModel(dbo)));</b>
+<b class="fc">&nbsp;        }catch (IllegalArgumentException e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+<b class="fc">&nbsp;        }catch (Exception e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    @DeleteMapping(&quot;/{id}&quot;)
 &nbsp;    public ResponseEntity&lt;?&gt; deleteEvent(@PathVariable UUID id){
 &nbsp;        try{
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.OK).body(eventService.removeEvent(id));</b>
-<b class="nc">&nbsp;        }catch (IllegalArgumentException e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
-<b class="nc">&nbsp;        }catch (Exception e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.OK).body(eventService.removeEvent(id));</b>
+<b class="fc">&nbsp;        }catch (IllegalArgumentException e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+<b class="fc">&nbsp;        }catch (Exception e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    @PostMapping(&quot;/{id}/register&quot;)
 &nbsp;    public ResponseEntity&lt;?&gt; registerUserToEvent(@PathVariable UUID id, @Valid @RequestBody registerUserToEventDTO user){
 &nbsp;        try{
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.registerUserToEvent(id, user.getUserId()));</b>
-<b class="nc">&nbsp;        }catch (IllegalArgumentException e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
-<b class="nc">&nbsp;        }catch (Exception e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.CREATED).body(eventService.registerUserToEvent(id, user.getUserId()));</b>
+<b class="fc">&nbsp;        }catch (IllegalArgumentException e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+<b class="fc">&nbsp;        }catch (Exception e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -182,14 +182,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    public ResponseEntity&lt;?&gt; getAllEventForUser(@PathVariable UUID id){
 &nbsp;        try{
 &nbsp;
-<b class="nc">&nbsp;            Set&lt;EventDTO&gt; dtos = eventService.getAllEventByUser(id).stream()</b>
-<b class="nc">&nbsp;                    .map(EventMapper::eventModelTODTO).collect(Collectors.toSet());</b>
+<b class="fc">&nbsp;            Set&lt;EventDTO&gt; dtos = eventService.getAllEventByUser(id).stream()</b>
+<b class="fc">&nbsp;                    .map(EventMapper::eventModelTODTO).collect(Collectors.toSet());</b>
 &nbsp;
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.OK).body(dtos);</b>
-<b class="nc">&nbsp;        }catch (IllegalArgumentException e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
-<b class="nc">&nbsp;        }catch (Exception e){</b>
-<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.OK).body(dtos);</b>
+<b class="fc">&nbsp;        }catch (IllegalArgumentException e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());</b>
+<b class="fc">&nbsp;        }catch (Exception e){</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
@@ -216,7 +216,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2025-04-18 13:43</div>
+    <div style="float:right;">generated on 2025-04-19 13:31</div>
 </div>
 </body>
 </html>

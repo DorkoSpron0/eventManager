@@ -23,7 +23,7 @@ public class UserDTO {
     @NotEmpty(message = "Password cant be blank")
     @NotNull(message = "Password cant be null")
     private String password;
-    Set<EventDTO> eventDTOS = new HashSet<>();
+    private Set<EventDTO> eventDTOS = new HashSet<>();
 
     public UserDTO() {
     }
@@ -32,6 +32,22 @@ public class UserDTO {
         this.id = id;
         this.username = username;
         this.password = password;
+    }
+
+    public Set<EventDTO> getEventDTOS() {
+        return eventDTOS;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public @NotEmpty(message = "Password cant be blank") @NotNull(message = "Password cant be null") String getPassword() {
+        return password;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     @Override

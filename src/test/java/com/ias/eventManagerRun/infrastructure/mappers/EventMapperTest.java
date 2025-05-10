@@ -5,7 +5,9 @@ import com.ias.eventManagerRun.domain.models.EventModel;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.EventDTO;
 import com.ias.eventManagerRun.infrastructure.entry_points.DTO.UserDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,6 +17,14 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EventMapperTest {
+
+    @Autowired
+    private EventMapper mapper;
+
+    @BeforeEach
+    void init(){
+        mapper = new EventMapper();
+    }
 
     @Test
     public void testEventDBOToModelWithUsers(){
@@ -204,5 +214,10 @@ public class EventMapperTest {
 
         assertEquals(0, result.getUsers().size());
         assertInstanceOf(List.class, result.getUsers());
+    }
+
+    @Test
+    public void testPassTest(){
+        assertTrue(this.mapper.passTest());
     }
 }

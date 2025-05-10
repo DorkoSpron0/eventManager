@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
 
-    private UserUseCases userUseCases;
+    private final UserUseCases userUseCases;
 
     @GetMapping
     public ResponseEntity<?> getAllUser(){

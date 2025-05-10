@@ -1,0 +1,1 @@
+INSERT INTO user_table (id, username, password) VALUES ('8e7da2ac-4789-4127-a376-4665a28ee4a6', 'Nicky', 'Password123@')

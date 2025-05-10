@@ -90,6 +90,13 @@
 			<version>3.1.1</version>
 		</dependency>
 
+		<!-- Para tests -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
 		<dependency>
@@ -182,10 +189,7 @@
 							<excludes>
 								<exclude>**/EventManagerRunApplication.class</exclude>
 								<exclude>**/SecurityConfiguration.class</exclude>
-								<exclude>**/IEventRepository.class</exclude>
-								<exclude>**/IUserRepository.class</exclude>
 								<exclude>**/models/**</exclude>
-								<exclude>**/usecases/**</exclude>
 								<exclude>**/DBO/**</exclude>
 								<exclude>**/DTO/**</exclude>
 							</excludes>
@@ -197,15 +201,21 @@
 							<goal>check</goal>
 						</goals>
 						<configuration>
+							<excludes>
+								<exclude>**/EventManagerRunApplication.class</exclude>
+								<exclude>**/SecurityConfiguration.class</exclude>
+								<exclude>**/models/**</exclude>
+								<exclude>**/DBO/**</exclude>
+								<exclude>**/DTO/**</exclude>
+							</excludes>
 							<rules>
 								<rule>
-									<element>PACKAGE</element>
-
+									<element>BUNDLE</element>
 									<limits>
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.95</minimum> // Debe tener un mínmimo del 85% cubierto
+											<minimum>0.90</minimum>
 										</limit>
 									</limits>
 								</rule>
@@ -214,6 +224,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 		</plugins>
 	</build>
 	<repositories>

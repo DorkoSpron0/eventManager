@@ -13,7 +13,7 @@ import java.util.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity(name = "user")
+@Entity(name = "user_table")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "username"))
 public class UserDBO {
 

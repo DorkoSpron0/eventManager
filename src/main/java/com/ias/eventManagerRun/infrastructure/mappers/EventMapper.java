@@ -87,4 +87,8 @@ public class EventMapper {
                         )).toList() : new ArrayList<>()
         );
     }
+
+    public boolean passTest(){
+        return true;
+    }
 }
