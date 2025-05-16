@@ -8,6 +8,8 @@ import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepos
 import com.ias.eventManagerRun.app.config.JwtService;
 import com.ias.eventManagerRun.infrastructure.mappers.UserMapper;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +22,9 @@ import java.util.function.Supplier;
 @Service
 public class UserRepositoryAdapter implements UserUseCases {
 
-    private IUserRepository userRepository;
-    private JwtService jwtService;
-    private PasswordEncoder passwordEncoder;
+    private final IUserRepository userRepository;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public UserRepositoryAdapter(JwtService jwtService, PasswordEncoder passwordEncoder, IUserRepository userRepository) {
         this.jwtService = jwtService;
@@ -31,8 +33,8 @@ public class UserRepositoryAdapter implements UserUseCases {
     }
 
     @Override
-    public Supplier<List<UserModel>> getAllUsers() {
-        return () -> userRepository.findAll()
+    public List<UserModel> getAllUsers() {
+        return userRepository.findAll()
                 .stream()
                 .map(UserMapper.userDBOToModel)
                 .toList();
@@ -40,54 +42,53 @@ public class UserRepositoryAdapter implements UserUseCases {
 
     @Transactional
     @Override
-    public Function<UserModel, Optional<UserModel>> registerUser() {
+    public Function<UserModel, UserModel> registerUser() {
         return (UserModel user) -> {
             // -> Validar si el usuario existe
             boolean exists = userRepository.existsByUsername(user.username().value());
-            if(exists) return Optional.empty();
+            if(exists) throw new DataIntegrityViolationException("Ese username ya existe, fallo al registrarse");
 
             // -> Codificar la contraseña
             String encodedPassword = passwordEncoder.encode(user.password().value());
 
             // -> Se crea un DBO con un nuevo UserModel porque user es inmutable
-            UserDBO dbo = UserMapper.userModelToDBO.apply(
-                    new UserModel(
+            return UserMapper.userModelToDBO
+                    .andThen(dbo -> userRepository.save(dbo))
+                    .andThen(UserMapper.userDBOToModel)
+                    .apply(new UserModel( // -> Es el que se va a mapear en userModelToDBO
                             user.id(),
                             user.username(),
                             new Password(encodedPassword),
                             user.eventModel()
                     )
-            );
-
-            UserDBO saved = userRepository.save(dbo);
-
-            // -> Mapear y return
-            return Optional.of(UserMapper.userDBOToModel.apply(saved));
+                );
         };
     }
 
     @Override
-    public Function<UUID, Optional<UserModel>> findById() {
+    public Function<UUID, UserModel> findById() {
         return (UUID id) -> userRepository.findById(id)
-                .map(UserMapper.userDBOToModel);
+                .map(UserMapper.userDBOToModel)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario"));
     }
 
     @Override
-    public Function<UserModel, Optional<String>> loginUser() {
-        // TODO - REFACTOR
-        return (UserModel model) -> userRepository.findByUsername(model.username().value()) // -> Esto ya devuelve Optional
-                .flatMap(user -> {
-                    boolean matches = passwordEncoder.matches(model.password().value(), user.getPassword());
-                    if(!matches) return Optional.empty();
+    public Function<UserModel, String> loginUser() {
+        return (UserModel model) -> userRepository.findByUsername(model.username().value())
+                .map(user -> {
+                    if(!passwordEncoder.matches(model.password().value(), user.getPassword())){
+                        throw new IllegalArgumentException("Las contraseñas no coinciden");
+                    }
 
-                    return Optional.of(jwtService.generateToken(user.getUsername()));
-                }
-            );
+                    return jwtService.generateToken(model.username().value());
+                })
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario"));
     }
 
     @Override
-    public Function<String, Optional<UserModel>> findByUsername() {
+    public Function<String, UserModel> findByUsername() {
         return (String username) -> userRepository.findByUsername(username)
-                .map(UserMapper.userDBOToModel);
+                .map(UserMapper.userDBOToModel)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario"));
     }
 }

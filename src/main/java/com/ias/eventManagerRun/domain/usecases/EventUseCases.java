@@ -3,26 +3,24 @@ package com.ias.eventManagerRun.domain.usecases;
 import com.ias.eventManagerRun.domain.models.EventModel;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public interface EventUseCases {
 
-    Supplier<List<EventModel>> getAllEvents();
+    List<EventModel> getAllEvents();
 
-    Function<EventModel, Optional<EventModel>> registerEvent();
+    Function<EventModel, EventModel> registerEvent();
 
-    Function<UUID, Optional<EventModel>> getEventById();
+    Function<UUID, EventModel> getEventById();
 
-    BiFunction<UUID, EventModel, Optional<EventModel>> updateEventById();
+    BiFunction<UUID, EventModel, EventModel> updateEventById();
 
-    BiFunction<UUID, UUID, Optional<String>> registerUserToEvent();
+    BiFunction<UUID, UUID, String> registerUserToEvent();
 
-    Function<UUID, Optional<Set<EventModel>>> getAllEventByUserId();
+    Function<UUID, Set<EventModel>> getAllEventByUserId();
 
-    Function<UUID, Optional<String>> removeEvent();
+    Function<UUID, String> removeEvent();
 }

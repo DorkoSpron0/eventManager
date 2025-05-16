@@ -10,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/iasapi/auth")
 @AllArgsConstructor
@@ -22,12 +20,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserDTO user){
         UserModel model = UserMapper.userDTORequireToModel.apply(user);
-        Optional<String> tokenOpt = this.userUseCases.loginUser().apply(model);
+        String tokenOpt = this.userUseCases.loginUser().apply(model);
 
-        if(tokenOpt.isEmpty()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Credenciales incorrectas");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(tokenOpt.get());
+        return ResponseEntity.status(HttpStatus.OK).body(tokenOpt);
     }
 }

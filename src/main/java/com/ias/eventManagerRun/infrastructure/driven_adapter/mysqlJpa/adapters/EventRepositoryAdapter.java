@@ -2,7 +2,6 @@ package com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.adapters;
 
 
 import com.ias.eventManagerRun.domain.models.EventModel;
-import com.ias.eventManagerRun.domain.usecases.UserUseCases;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.EventDBO;
 import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.DBO.UserDBO;
 import com.ias.eventManagerRun.domain.usecases.EventUseCases;
@@ -11,7 +10,7 @@ import com.ias.eventManagerRun.infrastructure.driven_adapter.mysqlJpa.IUserRepos
 import com.ias.eventManagerRun.infrastructure.mappers.EventMapper;
 import com.ias.eventManagerRun.infrastructure.mappers.UserMapper;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,14 +19,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
 public class EventRepositoryAdapter implements EventUseCases {
 
-    private IEventRepository eventRepository;
-    private IUserRepository userRepository;
+    private final IEventRepository eventRepository;
+    private final IUserRepository userRepository;
 
     public EventRepositoryAdapter(IEventRepository eventRepository, IUserRepository userRepository) {
         this.eventRepository = eventRepository;
@@ -35,40 +33,40 @@ public class EventRepositoryAdapter implements EventUseCases {
     }
 
     @Override
-    public Supplier<List<EventModel>> getAllEvents() {
-        return () -> eventRepository.findAll().stream()
+    public List<EventModel> getAllEvents() {
+        return eventRepository.findAll()
+                .stream()
                 .map(EventMapper.eventDBOToModel)
                 .toList();
     }
 
+    @Transactional
     @Override
-    public Function<EventModel, Optional<EventModel>> registerEvent() {
+    public Function<EventModel, EventModel> registerEvent() {
         return (EventModel model) -> {
             boolean founded = eventRepository.existsByName(model.name().value());
 
-            if(founded) return Optional.empty(); // -> si ya existe con ese nombre
+            if(founded) throw new DataIntegrityViolationException("Ya existe evento con ese nombre"); // -> si ya existe con ese nombre
 
-            EventDBO dbo = EventMapper.eventModelToDBO.apply(model);
-            EventDBO saved = eventRepository.save(dbo);
-
-            return Optional.of(EventMapper.eventDBOToModel.apply(saved));
+            return EventMapper.eventModelToDBO
+                    .andThen(eventRepository::save)
+                    .andThen(EventMapper.eventDBOToModel)
+                    .apply(model);
         };
     }
 
     @Override
-    public Function<UUID, Optional<EventModel>> getEventById() {
+    public Function<UUID, EventModel> getEventById() {
         return (UUID id) -> eventRepository.findById(id)
-                .map(EventMapper.eventDBOToModel);
+                .map(EventMapper.eventDBOToModel)
+                .orElseThrow(() -> new IllegalArgumentException("Ese evento no fue encontrado"));
     }
 
+    @Transactional
     @Override
-    public BiFunction<UUID, EventModel, Optional<EventModel>> updateEventById() {
+    public BiFunction<UUID, EventModel, EventModel> updateEventById() {
         return (UUID id, EventModel model) -> {
-            Optional<EventDBO> maybeEvent = eventRepository.findById(id);
-
-            if (maybeEvent.isEmpty()) return Optional.empty();
-
-            EventDBO current = maybeEvent.get();
+            EventDBO current = eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ese evento no fue encontrado"));
 
             Set<UserDBO> usersToSet = Optional.ofNullable(model.userModels()) // Porque puede estar null
                     .filter(users -> !users.isEmpty())// Verifica si está vacía
@@ -87,52 +85,49 @@ public class EventRepositoryAdapter implements EventUseCases {
             );
 
             EventDBO saved = eventRepository.save(updated);
-            return Optional.of(EventMapper.eventDBOToModel.apply(saved));
+            return EventMapper.eventDBOToModel.apply(saved);
         };
     }
 
+    @Transactional
     @Override
-    public BiFunction<UUID, UUID, Optional<String>> registerUserToEvent() {
+    public BiFunction<UUID, UUID, String> registerUserToEvent() {
         return (UUID userId, UUID eventId) -> {
-            Optional<UserDBO> userOpt = userRepository.findById(userId);
-            Optional<EventDBO> eventOpt = eventRepository.findById(eventId);
-
-            if(userOpt.isEmpty() || eventOpt.isEmpty()){
-                return Optional.empty();
-            }
-
-            EventDBO event = eventOpt.get();
-            UserDBO user = userOpt.get();
+            UserDBO user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Ese usuario no fue encontrado"));
+            EventDBO event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Ese evento no fue encontrado"));
 
             // Evitar duplicados
             if (event.getUserSet().contains(user)) {
-                return Optional.empty(); // Ya está registrado
+                throw new IllegalArgumentException("Ese usuarios ya está registrado"); // Ya está registrado
             }
 
             event.getUserSet().add(user);
             eventRepository.save(event);
 
-            return Optional.of("Usuario registrado al evento correctamente");
+            return "Usuario registrado al evento correctamente";
         };
     }
 
     @Override
-    public Function<UUID, Optional<Set<EventModel>>> getAllEventByUserId() {
+    public Function<UUID, Set<EventModel>> getAllEventByUserId() {
         return (UUID id) -> userRepository.findById(id) // -> Optional de UserDBO
                 .map(user -> user.getEventDBOS()
                         .stream()
                         .map(EventMapper.eventDBOToModel)
                         .collect(Collectors.toSet())
-                );
+                )
+                .orElseThrow(() -> new IllegalArgumentException("Ese usuarios no fue encontrado"));
     }
 
+    @Transactional
     @Override
-    public Function<UUID, Optional<String>> removeEvent() {
-        return (UUID id) -> eventRepository.findById(id)
-                .flatMap(dbo -> {
-                    eventRepository.delete(dbo);
-                    return Optional.of("Evento eliminado con éxito");
-                }
-            );
+    public Function<UUID, String> removeEvent() {
+        return (UUID userId) -> eventRepository.findById(userId)
+                .map(event -> {
+                    eventRepository.delete(event);
+
+                    return "El evento fue eliminado exitosamente";
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Ese evento no fue encontrado"));
     }
 }

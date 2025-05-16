@@ -22,83 +22,51 @@ public class EventController {
 
     @GetMapping
     public ResponseEntity<?> getAllEvents(){
-        return ResponseEntity.status(HttpStatus.OK).body(this.eventUseCases.getAllEvents().get().stream().map(EventMapper.eventModelToResponse));
+        return ResponseEntity.status(HttpStatus.OK).body(this.eventUseCases.getAllEvents().stream().map(EventMapper.eventModelToResponse));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getEventById(@PathVariable UUID id) {
-        Optional<EventModel> optionalEvent = eventUseCases.getEventById().apply(id);
+        EventModel optionalEvent = eventUseCases.getEventById().apply(id);
 
-        if (optionalEvent.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
-        }
-
-        EventModel founded = optionalEvent.get();
-
-        return ResponseEntity.ok(EventMapper.eventModelToResponse.apply(founded));
+        return ResponseEntity.ok(EventMapper.eventModelToResponse.apply(optionalEvent));
     }
 
     @PostMapping
     public ResponseEntity<?> registerEvent(@Valid @RequestBody EventDTO event){
 
         EventModel model = EventMapper.eventDTORequestToModel.apply(event);
-        Optional<EventModel> eventOpt = this.eventUseCases.registerEvent().apply(model);
+        EventModel eventOpt = this.eventUseCases.registerEvent().apply(model);
 
-        if(eventOpt.isEmpty()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Credenciales incorrectas");
-        }
-
-        EventModel saved = eventOpt.get();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(EventMapper.eventModelToResponse.apply(saved));
+        return ResponseEntity.status(HttpStatus.CREATED).body(EventMapper.eventModelToResponse.apply(eventOpt));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEvent(@PathVariable UUID id,@Valid @RequestBody EventDTO event){
         EventModel model = EventMapper.eventDTORequestToModel.apply(event);
-        Optional<EventModel> eventOpt = this.eventUseCases.updateEventById().apply(id, model);
+        EventModel eventOpt = this.eventUseCases.updateEventById().apply(id, model);
 
-        if(eventOpt.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evento no encontrado");
-        }
-
-        EventModel updated = eventOpt.get();
-
-        return ResponseEntity.status(HttpStatus.OK).body(EventMapper.eventModelToResponse.apply(updated));
+        return ResponseEntity.status(HttpStatus.OK).body(EventMapper.eventModelToResponse.apply(eventOpt));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable UUID id){
-        Optional<String> eventOpt = this.eventUseCases.removeEvent().apply(id);
+        String eventOpt = this.eventUseCases.removeEvent().apply(id);
 
-        if(eventOpt.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event not found");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body("Event removed successfully");
+        return ResponseEntity.status(HttpStatus.OK).body(eventOpt);
     }
 
     @PostMapping("/{id}/register")
     public ResponseEntity<?> registerUserToEvent(@PathVariable UUID id, @Valid @RequestBody registerUserToEventDTO user){
-        Optional<String> stringOpt = this.eventUseCases.registerUserToEvent().apply(user.userId(), id);
+        String stringOpt = this.eventUseCases.registerUserToEvent().apply(user.userId(), id);
 
-        if(stringOpt.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Credenciales incorrectas");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(stringOpt.get());
+        return ResponseEntity.status(HttpStatus.OK).body(stringOpt);
     }
 
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getAllEventForUser(@PathVariable UUID id){
-        Optional<Set<EventModel>> eventsOpt = this.eventUseCases.getAllEventByUserId().apply(id);
+        Set<EventModel> eventsOpt = this.eventUseCases.getAllEventByUserId().apply(id);
 
-        if(eventsOpt.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        Set<EventModel> events = eventsOpt.get();
-
-        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(EventMapper.eventModelToResponse));
+        return ResponseEntity.status(HttpStatus.OK).body(eventsOpt.stream().map(EventMapper.eventModelToResponse));
     }
 }
