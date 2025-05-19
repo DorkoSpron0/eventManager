@@ -11,7 +11,6 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity(name = "event")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class EventDBO {

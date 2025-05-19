@@ -12,7 +12,6 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity(name = "user")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "username"))
 public class UserDBO {
